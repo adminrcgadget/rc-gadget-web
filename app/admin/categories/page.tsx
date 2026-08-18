@@ -142,32 +142,30 @@ export default function AdminCategoriesPage() {
     setStatusMsg(null);
 
     try {
-      const payload = {
+      const payload: any = {
         ...editingCat,
         updated_at: new Date().toISOString(),
       };
 
-      const { data, error } = await supabase
+      const isUuid = payload.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(payload.id);
+      if (!isUuid) {
+        delete payload.id;
+      }
+
+      const { error } = await supabase
         .from("categories")
-        .upsert(payload as any)
+        .upsert(payload)
         .select();
 
       if (error) {
-        // If DB table not ready, update local state
-        setCategories((prev) => {
-          if (editingCat.id) {
-            return prev.map((c) => (c.id === editingCat.id ? ({ ...c, ...editingCat } as Category) : c));
-          } else {
-            return [...prev, { ...editingCat, id: `cat-${Date.now()}` } as Category];
-          }
-        });
-        setStatusMsg({ type: "success", text: `Category '${editingCat.name}' updated locally.` });
-      } else {
-        setStatusMsg({ type: "success", text: `Category '${editingCat.name}' saved successfully to Supabase!` });
-        await fetchCategories();
+        throw error;
       }
+
+      setStatusMsg({ type: "success", text: `Category '${editingCat.name}' saved successfully!` });
+      await fetchCategories();
       setIsModalOpen(false);
     } catch (err: any) {
+      console.error("Error saving category:", err);
       setStatusMsg({ type: "error", text: err.message || "Failed to save category" });
     } finally {
       setIsSaving(false);

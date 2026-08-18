@@ -125,28 +125,27 @@ export default function AdminSocialPage() {
     setStatusMsg(null);
 
     try {
-      const payload = {
+      const payload: any = {
         ...editingSocial,
         updated_at: new Date().toISOString(),
       };
 
-      const { error } = await supabase.from("social_links").upsert(payload as any);
+      const isUuid = payload.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(payload.id);
+      if (!isUuid) {
+        delete payload.id;
+      }
+
+      const { error } = await supabase.from("social_links").upsert(payload).select();
 
       if (error) {
-        setSocials((prev) => {
-          if (editingSocial.id) {
-            return prev.map((s) => (s.id === editingSocial.id ? ({ ...s, ...editingSocial } as SocialLink) : s));
-          } else {
-            return [...prev, { ...editingSocial, id: `soc-${Date.now()}` } as SocialLink];
-          }
-        });
-        setStatusMsg({ type: "success", text: "Social link updated locally." });
-      } else {
-        setStatusMsg({ type: "success", text: "Social link saved successfully!" });
-        await fetchSocials();
+        throw error;
       }
+
+      setStatusMsg({ type: "success", text: "Social link saved successfully!" });
+      await fetchSocials();
       setIsModalOpen(false);
     } catch (err: any) {
+      console.error("Error saving social link:", err);
       setStatusMsg({ type: "error", text: err.message || "Failed to save social link" });
     } finally {
       setIsSaving(false);

@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { HeroSection, SiteSettings } from "@/types/database";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Phone } from "lucide-react";
 
 interface HeroProps {
   hero: HeroSection;
@@ -12,93 +12,107 @@ interface HeroProps {
 }
 
 export const Hero: React.FC<HeroProps> = ({ hero, settings }) => {
+  // Content normalization logic
+  let line1 = hero.eyebrow || hero.heading_line_1 || "YOUR WORLD OF";
+  let line2 = hero.heading_line_2 || "REMOTE";
+  let line3 = hero.heading_line_3 || "CONTROL";
+
+  if (/remote\s*control/i.test(line1)) {
+    line1 = line1.replace(/remote\s*control/gi, "").trim();
+    if (!line1) line1 = "YOUR WORLD OF";
+  } else if (/remote/i.test(line1) && /remote/i.test(line2)) {
+    line1 = line1.replace(/remote/gi, "").trim();
+    if (!line1) line1 = "YOUR WORLD OF";
+  }
+
+  if (/control/i.test(line2) && /control/i.test(line3)) {
+    line2 = line2.replace(/control/gi, "").trim();
+    if (!line2) line2 = "REMOTE";
+  }
+
+  const bannerImg =
+    hero?.background_image_url ||
+    hero?.foreground_image_url ||
+    null;
+
   return (
-    <section
-      id="hero"
-      className="relative min-h-[92vh] sm:min-h-screen flex items-center pt-24 pb-12 overflow-hidden bg-[#050505]"
-    >
-      {/* Background Atmosphere & Ambient Lighting */}
-      <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-[#FF5500]/15 blur-[160px] pointer-events-none rounded-full" />
-      <div className="absolute top-1/2 left-10 w-96 h-96 bg-[#FF5500]/10 blur-[140px] pointer-events-none rounded-full" />
-
-      {/* Subtle Sparks & Smoke Overlay */}
-      <div className="absolute inset-0 bg-[radial-gradient(#FF5500_0.75px,transparent_0.75px)] [background-size:36px_36px] opacity-15 pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-4 items-center">
+    <section id="hero" className="pt-20 sm:pt-24 pb-4 sm:pb-6 bg-transparent relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Exact Panoramic Floating White Card Container */}
+        <div className="relative rounded-3xl bg-white border border-gray-200/80 shadow-[0_4px_30px_rgba(0,0,0,0.06)] overflow-hidden min-h-[380px] sm:min-h-[420px] lg:min-h-[460px] flex items-center">
           
-          {/* Left Column: Bold Motorsport Typography & CTAs */}
-          <div className="lg:col-span-6 flex flex-col items-start space-y-6 pt-4 sm:pt-0">
+          <div className="w-full grid grid-cols-1 lg:grid-cols-12 items-center p-6 sm:p-10 lg:p-12 xl:p-14 relative z-10">
             
-            {/* Headlines */}
-            <div className="space-y-0 tracking-tight font-black uppercase italic select-none">
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl text-white font-black tracking-tight leading-[1.05]">
-                {hero.heading_line_1 || "YOUR WORLD OF"}
-              </h1>
-              <div className="text-5xl sm:text-7xl lg:text-8xl font-black text-[#FF5500] tracking-tight leading-[1.0] rc-text-glow drop-shadow-[0_0_35px_rgba(255,85,0,0.45)]">
-                {hero.heading_line_2 || "REMOTE"}
+            {/* Left Column: Typography & CTAs (Col 5) */}
+            <div className="lg:col-span-5 space-y-3.5 sm:space-y-4">
+              
+              {/* Tag / Eyebrow */}
+              <div className="text-xs font-black uppercase tracking-wider text-[#FF5A00]">
+                {line1}
               </div>
-              <div className="text-4xl sm:text-6xl lg:text-7xl font-black text-white tracking-tight leading-[1.05]">
-                {hero.heading_line_3 || "CONTROL"}
+
+              {/* Main Headline */}
+              <div className="space-y-0 font-black italic uppercase tracking-tight select-none">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black italic text-[#111111] leading-[0.9]">
+                  {line2}
+                </h1>
+                <div className="text-4xl sm:text-5xl lg:text-6xl font-black italic text-[#FF5A00] leading-[0.9]">
+                  {line3}
+                </div>
               </div>
-            </div>
 
-            {/* Subtitle */}
-            <p className="text-zinc-300 text-sm sm:text-base max-w-lg leading-relaxed font-medium">
-              Premium RC Cars, Planes, Ships, Excavators and all{" "}
-              <span className="text-[#FF5500] font-bold">RC Gadgets.</span>
-            </p>
+              {/* Narrative Description */}
+              <p className="text-xs sm:text-sm text-gray-500 max-w-sm sm:max-w-md leading-relaxed pt-1">
+                {hero.description ||
+                  "Where passion meets performance. Experience high-octane RC motorsport, scale engineering marvels, and professional racing tracks right here in Kottakkal."}
+              </p>
 
-            {/* Tagline Highlight */}
-            <div className="text-xs sm:text-sm font-black tracking-wider uppercase leading-relaxed text-zinc-100 border-l-2 border-[#FF5500] pl-3 py-0.5">
-              <span>BUILT FOR </span>
-              <span className="text-[#FF5500]">PASSION.</span>
-              <br />
-              <span>DRIVEN BY </span>
-              <span className="text-[#FF5500]">PERFORMANCE.</span>
-            </div>
+              {/* Action Buttons */}
+              <div className="pt-2 flex flex-wrap items-center gap-3">
+                <Link
+                  href={hero.primary_button_url || "#our-world"}
+                  className="inline-flex items-center gap-2 px-6 py-2.5 sm:py-3 rounded-lg text-xs font-black uppercase tracking-wider text-white bg-[#FF5A00] hover:bg-[#FF6A00] shadow-sm shadow-[#FF5A00]/25 transition-all duration-300 group"
+                >
+                  <span>{hero.primary_button_text || "LEARN MORE"}</span>
+                  <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                </Link>
 
-            {/* Action Buttons */}
-            <div className="flex flex-wrap items-center gap-4 pt-2 w-full sm:w-auto">
-              <Link
-                href={hero.primary_button_url || "#about"}
-                className="px-7 py-3.5 rounded-lg font-black text-xs sm:text-sm tracking-wider uppercase text-white bg-[#FF5500] hover:bg-[#FF6A1A] shadow-lg shadow-[#FF5500]/30 hover:shadow-[#FF5500]/60 transition-all duration-300 flex items-center justify-center gap-2 group hover:-translate-y-0.5"
-              >
-                <span>{hero.primary_button_text || "LEARN MORE"}</span>
-                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </Link>
+                <Link
+                  href={hero.secondary_button_url || "#contact"}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 sm:py-3 rounded-lg text-xs font-black uppercase tracking-wider text-gray-800 bg-white border border-gray-200 hover:border-[#FF5A00] hover:text-[#FF5A00] transition-all duration-300 shadow-sm group"
+                >
+                  <Phone className="w-3.5 h-3.5 text-[#FF5A00]" />
+                  <span>{hero.secondary_button_text || "CONTACT US"}</span>
+                </Link>
+              </div>
 
-              <Link
-                href={hero.secondary_button_url || "#contact"}
-                className="px-7 py-3.5 rounded-lg font-black text-xs sm:text-sm tracking-wider uppercase text-white bg-[#111111]/80 hover:bg-[#1A1A1A] border border-white/20 hover:border-[#FF5500]/70 transition-all duration-300 flex items-center justify-center gap-2 group hover:-translate-y-0.5"
-              >
-                <span>{hero.secondary_button_text || "CONTACT US"}</span>
-                <ArrowRight className="w-4 h-4 text-[#FF5500] transition-transform group-hover:translate-x-1" />
-              </Link>
             </div>
 
           </div>
 
-          {/* Right Column: Giant RC Buggy / Monster Truck Hero Art */}
-          <div className="lg:col-span-6 relative flex items-center justify-center">
-            
-            {/* Ambient Backlight Aura */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#FF5500]/20 to-transparent blur-3xl rounded-full scale-110 pointer-events-none" />
-
-            <div className="relative w-full aspect-square max-w-[550px] lg:max-w-none transition-transform duration-700 hover:scale-105">
-              <Image
-                src={hero.background_image_url || "/assets/hero-main-banner.webp"}
-                alt="RC Gadgets Monster Buggy"
-                fill
-                sizes="(max-width: 1024px) 100vw, 650px"
-                className="object-contain object-center drop-shadow-[0_20px_40px_rgba(0,0,0,0.9)]"
-                priority
-              />
-            </div>
-
+          {/* Right Column: Hero Banner Artwork — spans full right area */}
+          <div className="absolute right-0 top-0 bottom-0 w-full lg:w-[60%] h-full flex items-center justify-end z-0 pointer-events-none lg:pointer-events-auto">
+            {bannerImg ? (
+              <div className="relative w-full h-full">
+                <Image
+                  src={bannerImg}
+                  alt={hero.heading_line_1 || "RC Gadgets Showcase"}
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 850px"
+                  className="object-contain object-right transition-transform duration-700"
+                />
+              </div>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs font-semibold uppercase tracking-wider">
+                Hero Banner Artwork (Upload in Admin)
+              </div>
+            )}
           </div>
 
         </div>
+
       </div>
     </section>
   );

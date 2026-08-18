@@ -107,28 +107,27 @@ export default function AdminBannersPage() {
     setStatusMsg(null);
 
     try {
-      const payload = {
+      const payload: any = {
         ...editingBanner,
         updated_at: new Date().toISOString(),
       };
 
-      const { error } = await supabase.from("banners").upsert(payload as any);
+      const isUuid = payload.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(payload.id);
+      if (!isUuid) {
+        delete payload.id;
+      }
+
+      const { error } = await supabase.from("banners").upsert(payload).select();
 
       if (error) {
-        setBanners((prev) => {
-          if (editingBanner.id) {
-            return prev.map((b) => (b.id === editingBanner.id ? ({ ...b, ...editingBanner } as Banner) : b));
-          } else {
-            return [...prev, { ...editingBanner, id: `ban-${Date.now()}` } as Banner];
-          }
-        });
-        setStatusMsg({ type: "success", text: `Banner updated locally.` });
-      } else {
-        setStatusMsg({ type: "success", text: `Banner saved successfully!` });
-        await fetchBanners();
+        throw error;
       }
+
+      setStatusMsg({ type: "success", text: `Banner saved successfully!` });
+      await fetchBanners();
       setIsModalOpen(false);
     } catch (err: any) {
+      console.error("Error saving banner:", err);
       setStatusMsg({ type: "error", text: err.message || "Failed to save banner" });
     } finally {
       setIsSaving(false);

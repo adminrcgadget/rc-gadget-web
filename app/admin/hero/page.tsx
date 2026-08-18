@@ -28,8 +28,8 @@ export default function AdminHeroPage() {
         if (data) {
           setHero(data as HeroSection);
         } else {
-          setHero({
-            id: "b0000000-0000-0000-0000-000000000001",
+          // No row exists yet — insert a blank starter row in DB so future saves work
+          const newHero: Omit<HeroSection, "id" | "created_at" | "updated_at"> = {
             eyebrow: "KOTTAKKAL — FIRST IN MALAPPURAM",
             heading_line_1: "YOUR WORLD OF",
             heading_line_2: "REMOTE",
@@ -40,12 +40,21 @@ export default function AdminHeroPage() {
             primary_button_url: "#our-world",
             secondary_button_text: "Experience Tracks",
             secondary_button_url: "#experience",
-            background_image_url: "/logo/WhatsApp Image 2026-08-17 at 6.53.56 PM.jpeg",
-            foreground_image_url: "/logo/WhatsApp Image 2026-08-17 at 6.53.55 PM (1).jpeg",
+            background_image_url: null,
+            foreground_image_url: null,
             is_active: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          });
+          };
+          const { data: inserted, error: insertError } = await supabase
+            .from("hero_section")
+            .insert(newHero as any)
+            .select()
+            .single();
+          if (inserted && !insertError) {
+            setHero(inserted as HeroSection);
+          } else {
+            // Fallback: set local state only so admin form is still usable
+            setHero({ ...newHero, id: "", created_at: new Date().toISOString(), updated_at: new Date().toISOString() } as HeroSection);
+          }
         }
       } catch (err) {
         console.error("Error fetching hero:", err);
@@ -65,16 +74,23 @@ export default function AdminHeroPage() {
     setStatusMsg(null);
 
     try {
-      const { error } = await supabase
+      const payload = { ...hero, updated_at: new Date().toISOString() };
+      if (!payload.id || typeof payload.id !== "string" || payload.id.trim() === "") {
+        delete (payload as any).id;
+      }
+
+      const { data: savedData, error } = await supabase
         .from("hero_section")
-        .upsert({
-          ...hero,
-          updated_at: new Date().toISOString(),
-        } as any);
+        .upsert(payload as any)
+        .select()
+        .maybeSingle();
 
       if (error) {
         setStatusMsg({ type: "error", text: error.message });
       } else {
+        if (savedData) {
+          setHero(savedData as HeroSection);
+        }
         setStatusMsg({ type: "success", text: "Hero section updated successfully!" });
       }
     } catch (err: any) {

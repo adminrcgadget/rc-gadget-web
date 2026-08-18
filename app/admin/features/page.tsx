@@ -120,28 +120,27 @@ export default function AdminFeaturesPage() {
     setStatusMsg(null);
 
     try {
-      const payload = {
+      const payload: any = {
         ...editingFeature,
         updated_at: new Date().toISOString(),
       };
 
-      const { error } = await supabase.from("features").upsert(payload as any);
+      const isUuid = payload.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(payload.id);
+      if (!isUuid) {
+        delete payload.id;
+      }
+
+      const { error } = await supabase.from("features").upsert(payload).select();
 
       if (error) {
-        setFeatures((prev) => {
-          if (editingFeature.id) {
-            return prev.map((f) => (f.id === editingFeature.id ? ({ ...f, ...editingFeature } as Feature) : f));
-          } else {
-            return [...prev, { ...editingFeature, id: `feat-${Date.now()}` } as Feature];
-          }
-        });
-        setStatusMsg({ type: "success", text: `Feature updated locally.` });
-      } else {
-        setStatusMsg({ type: "success", text: `Feature saved successfully!` });
-        await fetchFeatures();
+        throw error;
       }
+
+      setStatusMsg({ type: "success", text: `Feature saved successfully!` });
+      await fetchFeatures();
       setIsModalOpen(false);
     } catch (err: any) {
+      console.error("Error saving feature:", err);
       setStatusMsg({ type: "error", text: err.message || "Failed to save feature" });
     } finally {
       setIsSaving(false);

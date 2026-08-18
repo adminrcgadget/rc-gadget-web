@@ -42,7 +42,12 @@ export const AdminSidebar: React.FC<{ isOpen?: boolean; onClose?: () => void }> 
   const supabase = createClient();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    try {
+      await fetch("/api/admin/logout", { method: "POST" });
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.error(e);
+    }
     router.push("/admin/login");
     router.refresh();
   };

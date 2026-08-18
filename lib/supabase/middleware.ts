@@ -45,10 +45,12 @@ export const updateSession = async (request: NextRequest) => {
   } = await supabase.auth.getUser();
 
   const pathname = request.nextUrl.pathname;
+  const adminCookie = request.cookies.get("admin_session")?.value;
+  const isAuthenticated = adminCookie === "authenticated" || !!user;
 
   // Protect /admin routes (except /admin/login)
   if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
-    if (!user) {
+    if (!isAuthenticated) {
       const url = request.nextUrl.clone();
       url.pathname = "/admin/login";
       url.searchParams.set("redirectTo", pathname);
@@ -57,7 +59,7 @@ export const updateSession = async (request: NextRequest) => {
   }
 
   // If user is already authenticated and visits /admin/login, redirect to /admin
-  if (pathname === "/admin/login" && user) {
+  if (pathname === "/admin/login" && isAuthenticated) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin";
     return NextResponse.redirect(url);
