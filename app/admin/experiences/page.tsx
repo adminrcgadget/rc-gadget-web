@@ -110,28 +110,27 @@ export default function AdminExperiencesPage() {
     setStatusMsg(null);
 
     try {
-      const payload = {
+      const payload: any = {
         ...editingExp,
         updated_at: new Date().toISOString(),
       };
 
-      const { error } = await supabase.from("experiences").upsert(payload as any);
+      const isUuid = payload.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(payload.id);
+      if (!isUuid) {
+        delete payload.id;
+      }
+
+      const { error } = await supabase.from("experiences").upsert(payload).select();
 
       if (error) {
-        setExperiences((prev) => {
-          if (editingExp.id) {
-            return prev.map((ex) => (ex.id === editingExp.id ? ({ ...ex, ...editingExp } as Experience) : ex));
-          } else {
-            return [...prev, { ...editingExp, id: `exp-${Date.now()}` } as Experience];
-          }
-        });
-        setStatusMsg({ type: "success", text: "Experience updated locally." });
-      } else {
-        setStatusMsg({ type: "success", text: "Experience saved successfully to Supabase!" });
-        await fetchExperiences();
+        throw error;
       }
+
+      setStatusMsg({ type: "success", text: "Experience saved successfully to Supabase!" });
+      await fetchExperiences();
       setIsModalOpen(false);
     } catch (err: any) {
+      console.error("Error saving experience:", err);
       setStatusMsg({ type: "error", text: err.message || "Failed to save experience" });
     } finally {
       setIsSaving(false);

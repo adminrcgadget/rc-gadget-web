@@ -69,19 +69,32 @@ export default function AdminSettingsPage() {
     setStatusMsg(null);
 
     try {
-      const { error } = await supabase
+      const payload: any = {
+        ...settings,
+        updated_at: new Date().toISOString(),
+      };
+
+      const isUuid = payload.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(payload.id);
+      if (!isUuid) {
+        delete payload.id;
+      }
+
+      const { data: savedData, error } = await supabase
         .from("site_settings")
-        .upsert({
-          ...settings,
-          updated_at: new Date().toISOString(),
-        } as any);
+        .upsert(payload)
+        .select()
+        .maybeSingle();
 
       if (error) {
-        setStatusMsg({ type: "error", text: error.message });
-      } else {
-        setStatusMsg({ type: "success", text: "Site settings updated successfully!" });
+        throw error;
       }
+
+      if (savedData) {
+        setSettings(savedData as SiteSettings);
+      }
+      setStatusMsg({ type: "success", text: "Site settings updated successfully!" });
     } catch (err: any) {
+      console.error("Error saving site settings:", err);
       setStatusMsg({ type: "error", text: err.message || "Failed to update settings" });
     } finally {
       setIsSaving(false);

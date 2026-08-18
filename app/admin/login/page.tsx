@@ -12,44 +12,28 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [isSignUpMode, setIsSignUpMode] = useState(false);
-  const [infoMsg, setInfoMsg] = useState<string | null>(null);
 
   const router = useRouter();
-  const supabase = createClient();
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMsg(null);
-    setInfoMsg(null);
 
     try {
-      if (isSignUpMode) {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-        if (error) {
-          setErrorMsg(error.message);
-        } else if (data.session) {
-          router.push("/admin");
-          router.refresh();
-        } else {
-          setInfoMsg("Registration submitted. If email verification is enabled, please check your inbox.");
-        }
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-        if (error) {
-          setErrorMsg(error.message);
-        } else {
-          router.push("/admin");
-          router.refresh();
-        }
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        setErrorMsg(data.message || "Invalid login credentials.");
+      } else {
+        router.push("/admin");
+        router.refresh();
       }
     } catch (err: any) {
       setErrorMsg(err.message || "An unexpected authentication error occurred.");
@@ -80,7 +64,7 @@ export default function AdminLoginPage() {
 
           <div>
             <h1 className="text-xl font-black uppercase text-white tracking-wide">
-              {isSignUpMode ? "Create Admin Account" : "Admin Portal Login"}
+              Admin Portal Login
             </h1>
             <p className="text-xs text-zinc-400 mt-1">
               Secure access to manage live business website content
@@ -88,18 +72,11 @@ export default function AdminLoginPage() {
           </div>
         </div>
 
-        {/* Error / Info Alerts */}
+        {/* Error Alert */}
         {errorMsg && (
           <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-semibold flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{errorMsg}</span>
-          </div>
-        )}
-
-        {infoMsg && (
-          <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold flex items-center gap-2">
-            <Sparkles className="w-4 h-4 shrink-0" />
-            <span>{infoMsg}</span>
           </div>
         )}
 
@@ -151,32 +128,15 @@ export default function AdminLoginPage() {
               </>
             ) : (
               <>
-                <span>{isSignUpMode ? "Create Account" : "Access Dashboard"}</span>
+                <span>Access Dashboard</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>
         </form>
 
-        {/* Toggle Mode */}
-        <div className="pt-2 border-t border-white/10 text-center">
-          <button
-            type="button"
-            onClick={() => {
-              setIsSignUpMode(!isSignUpMode);
-              setErrorMsg(null);
-              setInfoMsg(null);
-            }}
-            className="text-xs text-zinc-400 hover:text-[#FF5500] transition-colors"
-          >
-            {isSignUpMode
-              ? "Already have an account? Sign In"
-              : "Need to create the first admin account? Sign Up"}
-          </button>
-        </div>
-
         {/* Back to public site */}
-        <div className="text-center">
+        <div className="text-center pt-2">
           <Link
             href="/"
             className="text-[11px] font-bold text-zinc-500 hover:text-zinc-300 uppercase tracking-wider"

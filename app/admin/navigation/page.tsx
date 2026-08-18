@@ -85,28 +85,27 @@ export default function AdminNavigationPage() {
     setStatusMsg(null);
 
     try {
-      const payload = {
+      const payload: any = {
         ...editingItem,
         updated_at: new Date().toISOString(),
       };
 
-      const { error } = await supabase.from("navigation_items").upsert(payload as any);
+      const isUuid = payload.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(payload.id);
+      if (!isUuid) {
+        delete payload.id;
+      }
+
+      const { error } = await supabase.from("navigation_items").upsert(payload).select();
 
       if (error) {
-        setNavItems((prev) => {
-          if (editingItem.id) {
-            return prev.map((n) => (n.id === editingItem.id ? ({ ...n, ...editingItem } as NavigationItem) : n));
-          } else {
-            return [...prev, { ...editingItem, id: `nav-${Date.now()}` } as NavigationItem];
-          }
-        });
-        setStatusMsg({ type: "success", text: "Navigation item updated locally." });
-      } else {
-        setStatusMsg({ type: "success", text: "Navigation item saved successfully!" });
-        await fetchNavItems();
+        throw error;
       }
+
+      setStatusMsg({ type: "success", text: "Navigation item saved successfully!" });
+      await fetchNavItems();
       setIsModalOpen(false);
     } catch (err: any) {
+      console.error("Error saving navigation item:", err);
       setStatusMsg({ type: "error", text: err.message || "Failed to save navigation item" });
     } finally {
       setIsSaving(false);

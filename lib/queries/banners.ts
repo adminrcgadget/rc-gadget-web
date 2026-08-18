@@ -26,7 +26,6 @@ export async function getActiveBanners(): Promise<Banner[]> {
     const { data, error } = await supabase
       .from("banners")
       .select("*")
-      .eq("is_active", true)
       .order("sort_order", { ascending: true });
 
     if (error || !data || data.length === 0) {
@@ -34,7 +33,9 @@ export async function getActiveBanners(): Promise<Banner[]> {
       return defaultBanners;
     }
 
-    return data as Banner[];
+    // Allow banners where is_active is null or true (only drop explicit false)
+    const active = data.filter((b: any) => b.is_active !== false);
+    return (active.length > 0 ? active : data) as Banner[];
   } catch (err) {
     console.error("Failed to fetch banners:", err);
     return defaultBanners;

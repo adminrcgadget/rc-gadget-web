@@ -147,75 +147,16 @@ CREATE TABLE IF NOT EXISTS public.social_links (
 );
 
 -- =========================================================
--- ROW LEVEL SECURITY (RLS) POLICIES
--- =========================================================
-
--- Enable RLS on all tables
-ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.navigation_items ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.hero_section ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.banners ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.about_section ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.features ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.experiences ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.social_links ENABLE ROW LEVEL SECURITY;
-
--- 1. PUBLIC READ POLICIES
-DROP POLICY IF EXISTS "Public read site_settings" ON public.site_settings;
-CREATE POLICY "Public read site_settings" ON public.site_settings FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "Public read navigation_items" ON public.navigation_items;
-CREATE POLICY "Public read navigation_items" ON public.navigation_items FOR SELECT USING (is_visible = true);
-
-DROP POLICY IF EXISTS "Public read hero_section" ON public.hero_section;
-CREATE POLICY "Public read hero_section" ON public.hero_section FOR SELECT USING (is_active = true);
-
-DROP POLICY IF EXISTS "Public read categories" ON public.categories;
-CREATE POLICY "Public read categories" ON public.categories FOR SELECT USING (is_active = true);
-
-DROP POLICY IF EXISTS "Public read banners" ON public.banners;
-CREATE POLICY "Public read banners" ON public.banners FOR SELECT USING (is_active = true);
-
-DROP POLICY IF EXISTS "Public read about_section" ON public.about_section;
-CREATE POLICY "Public read about_section" ON public.about_section FOR SELECT USING (is_active = true);
-
-DROP POLICY IF EXISTS "Public read features" ON public.features;
-CREATE POLICY "Public read features" ON public.features FOR SELECT USING (is_active = true);
-
-DROP POLICY IF EXISTS "Public read experiences" ON public.experiences;
-CREATE POLICY "Public read experiences" ON public.experiences FOR SELECT USING (is_active = true);
-
-DROP POLICY IF EXISTS "Public read social_links" ON public.social_links;
-CREATE POLICY "Public read social_links" ON public.social_links FOR SELECT USING (is_active = true);
-
--- 2. AUTHENTICATED ADMIN FULL ACCESS POLICIES
-DROP POLICY IF EXISTS "Admin all site_settings" ON public.site_settings;
-CREATE POLICY "Admin all site_settings" ON public.site_settings FOR ALL TO authenticated USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Admin all navigation_items" ON public.navigation_items;
-CREATE POLICY "Admin all navigation_items" ON public.navigation_items FOR ALL TO authenticated USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Admin all hero_section" ON public.hero_section;
-CREATE POLICY "Admin all hero_section" ON public.hero_section FOR ALL TO authenticated USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Admin all categories" ON public.categories;
-CREATE POLICY "Admin all categories" ON public.categories FOR ALL TO authenticated USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Admin all banners" ON public.banners;
-CREATE POLICY "Admin all banners" ON public.banners FOR ALL TO authenticated USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Admin all about_section" ON public.about_section;
-CREATE POLICY "Admin all about_section" ON public.about_section FOR ALL TO authenticated USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Admin all features" ON public.features;
-CREATE POLICY "Admin all features" ON public.features FOR ALL TO authenticated USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Admin all experiences" ON public.experiences;
-CREATE POLICY "Admin all experiences" ON public.experiences FOR ALL TO authenticated USING (true) WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Admin all social_links" ON public.social_links;
-CREATE POLICY "Admin all social_links" ON public.social_links FOR ALL TO authenticated USING (true) WITH CHECK (true);
+-- 1. DISABLE RLS (Admin authentication is handled securely via Next.js middleware and .env credentials)
+ALTER TABLE public.site_settings DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.navigation_items DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.hero_section DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.categories DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.banners DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.about_section DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.features DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.experiences DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.social_links DISABLE ROW LEVEL SECURITY;
 
 -- =========================================================
 -- SEED INITIAL DATA (With Cloudinary CDN URLs)

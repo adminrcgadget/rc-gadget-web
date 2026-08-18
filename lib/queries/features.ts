@@ -50,7 +50,6 @@ export async function getFeatures(): Promise<Feature[]> {
     const { data, error } = await supabase
       .from("features")
       .select("*")
-      .eq("is_active", true)
       .order("sort_order", { ascending: true });
 
     if (error || !data || data.length === 0) {
@@ -58,7 +57,9 @@ export async function getFeatures(): Promise<Feature[]> {
       return defaultFeatures;
     }
 
-    return data as Feature[];
+    // Filter out explicitly inactive (is_active === false), but allow null (treat as active)
+    const active = data.filter((f: any) => f.is_active !== false);
+    return (active.length > 0 ? active : data) as Feature[];
   } catch (err) {
     console.error("Failed to fetch features:", err);
     return defaultFeatures;

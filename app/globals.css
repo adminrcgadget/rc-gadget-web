@@ -2,74 +2,62 @@
 
 @layer base {
   :root {
-    --bg-main: #050505;
-    --bg-secondary: #0B0B0B;
-    --bg-card: #111111;
-    --bg-card-hover: #171717;
-    --border-subtle: rgba(255, 255, 255, 0.08);
-    --border-orange: rgba(255, 85, 0, 0.35);
-    --text-primary: #FFFFFF;
-    --text-secondary: #9CA3AF;
-    --accent-orange: #FF5500;
-    --accent-orange-hover: #FF6A1A;
-    --accent-glow: rgba(255, 85, 0, 0.25);
+    --bg-main: #FAFAFA;
+    --bg-secondary: #FFFFFF;
+    --bg-card: #FFFFFF;
+    --bg-card-hover: #F4F5F7;
+    --border-subtle: rgba(0, 0, 0, 0.08);
+    --border-orange: rgba(255, 90, 0, 0.4);
+    --text-primary: #111111;
+    --text-secondary: #6B7280;
+    --accent-orange: #FF5A00;
+    --accent-orange-bright: #FF6A00;
+    --accent-glow: rgba(255, 90, 0, 0.2);
   }
 
   html {
     scroll-behavior: smooth;
-    color-scheme: dark;
-    background-color: var(--bg-main);
+    color-scheme: light;
+    background-color: #FAFAFA;
   }
 
   body {
-    background-color: var(--bg-main);
-    color: var(--text-primary);
+    background-color: #FAFAFA;
+    color: #111111;
     overflow-x: hidden;
-    selection-background-color: #FF5500;
-    selection-color: #000000;
+    selection-background-color: #FF5A00;
+    selection-color: #FFFFFF;
   }
 }
 
-/* Custom Motorsport & Futuristic Utility Styles */
+/* Custom Motorsport Utility Styles */
 .rc-glow {
-  box-shadow: 0 0 25px rgba(255, 85, 0, 0.18);
+  box-shadow: 0 4px 20px rgba(255, 90, 0, 0.15);
 }
 
 .rc-glow-lg {
-  box-shadow: 0 0 50px rgba(255, 85, 0, 0.28);
+  box-shadow: 0 10px 40px rgba(255, 90, 0, 0.2);
 }
 
 .rc-text-glow {
-  text-shadow: 0 0 15px rgba(255, 85, 0, 0.4);
-}
-
-.rc-border-gradient {
-  border-image: linear-gradient(to right, rgba(255, 85, 0, 0.8), rgba(255, 255, 255, 0.1)) 1;
+  text-shadow: 0 0 20px rgba(255, 90, 0, 0.25);
 }
 
 .rc-mesh-bg {
-  background-image: radial-gradient(circle at 50% 0%, rgba(255, 85, 0, 0.08) 0%, transparent 60%),
-                    radial-gradient(circle at 100% 100%, rgba(255, 85, 0, 0.04) 0%, transparent 50%);
-}
-
-.rc-carbon-grid {
-  background-size: 32px 32px;
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-image: radial-gradient(circle at 50% 0%, rgba(255, 90, 0, 0.03) 0%, transparent 60%);
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #050505;
+  background: #F1F1F1;
 }
 ::-webkit-scrollbar-thumb {
-  background: #222222;
+  background: #D1D5DB;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #FF5500;
+  background: #FF5A00;
 }

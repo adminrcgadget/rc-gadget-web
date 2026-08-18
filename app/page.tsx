@@ -46,14 +46,14 @@ export default async function HomePage() {
   ]);
 
   return (
-    <main className="min-h-screen bg-[#050505] text-white selection:bg-[#FF5500] selection:text-black relative rc-mesh-bg rc-carbon-grid">
+    <main className="min-h-screen bg-[#FAFAFA] text-[#111111] selection:bg-[#FF5A00] selection:text-white relative">
       {/* 1. Header Navigation */}
       <Header settings={settings} navigation={navigation} />
 
       {/* 2. Hero Section */}
       <Hero hero={hero} settings={settings} />
 
-      {/* 3. Categories 5-Icon Horizontal Strip */}
+      {/* 3. Categories 5-Icon Horizontal Strip Module */}
       <WorldSection categories={categories} />
 
       {/* 4. Coming Soon Banner */}
@@ -65,7 +65,7 @@ export default async function HomePage() {
       {/* 6. Experience The Thrill Track Cards */}
       <ExperienceSection experiences={experiences} />
 
-      {/* 7. Metallic Light Contact Strip */}
+      {/* 7. Contact Info Dark Panel */}
       <ContactSection settings={settings} />
 
       {/* 8. Social Bar & Footer */}
