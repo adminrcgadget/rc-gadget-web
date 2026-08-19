@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { ImageUploader } from "@/components/admin/ImageUploader";
@@ -18,6 +18,8 @@ import {
   X,
   Eye,
   EyeOff,
+  Upload,
+  Sparkles,
 } from "lucide-react";
 
 export default function AdminCategoriesPage() {
@@ -29,6 +31,11 @@ export default function AdminCategoriesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCat, setEditingCat] = useState<Partial<Category> | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isImageUploading, setIsImageUploading] = useState(false);
+
+  // Direct card upload state
+  const [uploadingCardId, setUploadingCardId] = useState<string | null>(null);
+  const cardFileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
   // Delete Confirm Dialog
   const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
@@ -47,64 +54,7 @@ export default function AdminCategoriesPage() {
       if (data && data.length > 0) {
         setCategories(data as Category[]);
       } else {
-        // Fallback default list for initial setup
-        setCategories([
-          {
-            id: "cat-1",
-            name: "RC Cars",
-            short_description: "High-speed brushless buggies, extreme rock crawlers, precision drift machines & 4WD scale racers.",
-            icon_url: null,
-            image_url: "/logo/WhatsApp Image 2026-08-17 at 6.53.55 PM (1).jpeg",
-            sort_order: 1,
-            is_active: true,
-            created_at: "",
-            updated_at: "",
-          },
-          {
-            id: "cat-2",
-            name: "RC Planes",
-            short_description: "Aerobatic aircraft, scale turbine jets, warbirds & ultra-stable high-altitude precision flyers.",
-            icon_url: null,
-            image_url: "/logo/WhatsApp Image 2026-08-17 at 6.53.55 PM (1).jpeg",
-            sort_order: 2,
-            is_active: true,
-            created_at: "",
-            updated_at: "",
-          },
-          {
-            id: "cat-3",
-            name: "RC Ships",
-            short_description: "High-velocity brushless speedboats, twin-hull hydroplanes & authentic scale battleships.",
-            icon_url: null,
-            image_url: "/logo/WhatsApp Image 2026-08-17 at 6.53.55 PM (1).jpeg",
-            sort_order: 3,
-            is_active: true,
-            created_at: "",
-            updated_at: "",
-          },
-          {
-            id: "cat-4",
-            name: "RC Excavators",
-            short_description: "Heavy-duty full-metal hydraulic diggers, articulated dump trucks & construction giants.",
-            icon_url: null,
-            image_url: "/logo/WhatsApp Image 2026-08-17 at 6.53.55 PM (1).jpeg",
-            sort_order: 4,
-            is_active: true,
-            created_at: "",
-            updated_at: "",
-          },
-          {
-            id: "cat-5",
-            name: "RC Gadgets & Radios",
-            short_description: "Pro-level multi-channel radio transmitters, telemetry systems, LiPo chargers, FPV gear & performance accessories.",
-            icon_url: null,
-            image_url: "/logo/WhatsApp Image 2026-08-17 at 6.53.55 PM (1).jpeg",
-            sort_order: 5,
-            is_active: true,
-            created_at: "",
-            updated_at: "",
-          },
-        ]);
+        setCategories([]);
       }
     } catch (err) {
       console.error("Error fetching categories:", err);
@@ -134,6 +84,59 @@ export default function AdminCategoriesPage() {
     setIsModalOpen(true);
   };
 
+  // Direct 1-Click Image Upload for a Category Card
+  const handleDirectCardUpload = async (cat: Category, file: File) => {
+    if (!file || !cat.id) return;
+    setUploadingCardId(cat.id);
+    setStatusMsg(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "category-images");
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.url) {
+        throw new Error(result.error || "Image upload failed");
+      }
+
+      const newImageUrl = result.url;
+
+      // Update Supabase DB directly
+      const { error: dbError } = await (supabase.from("categories") as any)
+        .update({
+          image_url: newImageUrl,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", cat.id);
+
+      if (dbError) throw dbError;
+
+      // Update local state immediately
+      setCategories((prev) =>
+        prev.map((c) => (c.id === cat.id ? { ...c, image_url: newImageUrl } : c))
+      );
+
+      setStatusMsg({
+        type: "success",
+        text: `Photo updated successfully for '${cat.name}'!`,
+      });
+    } catch (err: any) {
+      console.error("Direct upload error:", err);
+      setStatusMsg({
+        type: "error",
+        text: err.message || "Failed to upload photo for category",
+      });
+    } finally {
+      setUploadingCardId(null);
+    }
+  };
+
   const handleSaveCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingCat || !editingCat.name) return;
@@ -142,31 +145,53 @@ export default function AdminCategoriesPage() {
     setStatusMsg(null);
 
     try {
-      const payload: any = {
-        ...editingCat,
-        updated_at: new Date().toISOString(),
-      };
+      const isUuid =
+        editingCat.id &&
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          editingCat.id
+        );
 
-      const isUuid = payload.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(payload.id);
-      if (!isUuid) {
-        delete payload.id;
+      if (editingCat.id && isUuid) {
+        // Update existing record
+        const { error } = await (supabase.from("categories") as any)
+          .update({
+            name: editingCat.name,
+            short_description: editingCat.short_description || "",
+            image_url: editingCat.image_url || null,
+            icon_url: editingCat.icon_url || null,
+            sort_order: editingCat.sort_order ?? 1,
+            is_active: editingCat.is_active ?? true,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", editingCat.id);
+
+        if (error) throw error;
+      } else {
+        // Insert new record
+        const { error } = await (supabase.from("categories") as any).insert({
+          name: editingCat.name,
+          short_description: editingCat.short_description || "",
+          image_url: editingCat.image_url || null,
+          icon_url: editingCat.icon_url || null,
+          sort_order: editingCat.sort_order ?? 1,
+          is_active: editingCat.is_active ?? true,
+        });
+
+        if (error) throw error;
       }
 
-      const { error } = await supabase
-        .from("categories")
-        .upsert(payload)
-        .select();
-
-      if (error) {
-        throw error;
-      }
-
-      setStatusMsg({ type: "success", text: `Category '${editingCat.name}' saved successfully!` });
+      setStatusMsg({
+        type: "success",
+        text: `Category '${editingCat.name}' saved successfully to database!`,
+      });
       await fetchCategories();
       setIsModalOpen(false);
     } catch (err: any) {
       console.error("Error saving category:", err);
-      setStatusMsg({ type: "error", text: err.message || "Failed to save category" });
+      setStatusMsg({
+        type: "error",
+        text: err.message || "Failed to save category",
+      });
     } finally {
       setIsSaving(false);
     }
@@ -177,15 +202,22 @@ export default function AdminCategoriesPage() {
 
     setIsDeleting(true);
     try {
-      const { error } = await supabase
-        .from("categories")
+      const { error } = await (supabase.from("categories") as any)
         .delete()
         .eq("id", deleteTarget.id);
 
+      if (error) throw error;
+
       setCategories((prev) => prev.filter((c) => c.id !== deleteTarget.id));
-      setStatusMsg({ type: "success", text: `Category '${deleteTarget.name}' deleted successfully.` });
+      setStatusMsg({
+        type: "success",
+        text: `Category '${deleteTarget.name}' deleted successfully.`,
+      });
     } catch (err: any) {
-      setStatusMsg({ type: "error", text: err.message || "Failed to delete category" });
+      setStatusMsg({
+        type: "error",
+        text: err.message || "Failed to delete category",
+      });
     } finally {
       setIsDeleting(false);
       setDeleteTarget(null);
@@ -210,8 +242,8 @@ export default function AdminCategoriesPage() {
   return (
     <div className="space-y-8">
       <AdminHeader
-        title="RC Categories Management"
-        subtitle="Add, edit, reorder, and upload media for RC vehicle categories displayed on the public site"
+        title="Our World — RC Vehicle Photos & Categories"
+        subtitle="Upload, edit, and manage high-resolution photos and descriptions for the RC vehicle categories displayed in 'Our World'"
       />
 
       {statusMsg && (
@@ -232,19 +264,21 @@ export default function AdminCategoriesPage() {
       )}
 
       {/* Action Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-xs font-bold text-zinc-400 uppercase tracking-wider">
           <Layers className="w-4 h-4 text-[#FF5500]" />
-          <span>{categories.length} Total Categories</span>
+          <span>{categories.length} Categories in &ldquo;Our World&rdquo;</span>
         </div>
 
-        <button
-          onClick={handleOpenAdd}
-          className="px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider text-white bg-[#FF5500] hover:bg-[#FF6A1A] shadow-lg shadow-[#FF5500]/25 transition-all flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add New Category</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleOpenAdd}
+            className="px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider text-white bg-[#FF5500] hover:bg-[#FF6A1A] shadow-lg shadow-[#FF5500]/25 transition-all flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add New Category</span>
+          </button>
+        </div>
       </div>
 
       {/* Categories Table / Card Grid */}
@@ -254,91 +288,155 @@ export default function AdminCategoriesPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((cat, idx) => (
-            <div
-              key={cat.id || idx}
-              className={`rounded-3xl bg-[#0E0E0E] border ${
-                cat.is_active ? "border-white/10" : "border-white/5 opacity-60"
-              } p-6 flex flex-col justify-between space-y-4 hover:border-[#FF5500]/50 transition-all shadow-xl`}
-            >
-              <div>
-                {/* Header Image Thumbnail & Sort Order */}
-                <div className="relative w-full h-40 rounded-2xl overflow-hidden bg-black/60 border border-white/10 mb-4">
-                  {cat.image_url ? (
-                    <Image
-                      src={cat.image_url}
-                      alt={cat.name}
-                      fill
-                      sizes="300px"
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-zinc-600">
-                      <Layers className="w-8 h-8 text-[#FF5500]" />
+          {categories.map((cat, idx) => {
+            const isThisCardUploading = uploadingCardId === cat.id;
+
+            return (
+              <div
+                key={cat.id || idx}
+                className={`rounded-3xl bg-[#0E0E0E] border ${
+                  cat.is_active ? "border-white/10" : "border-white/5 opacity-60"
+                } p-6 flex flex-col justify-between space-y-4 hover:border-[#FF5500]/50 transition-all shadow-xl relative overflow-hidden`}
+              >
+                <div>
+                  {/* Header Image Thumbnail & Direct Upload Box */}
+                  <div className="relative w-full h-48 rounded-2xl overflow-hidden bg-[#050505] border border-zinc-800 mb-4 flex items-center justify-center p-3 group">
+                    {cat.image_url ? (
+                      <Image
+                        src={cat.image_url}
+                        alt={cat.name}
+                        fill
+                        sizes="300px"
+                        className="object-contain p-2 transition-transform duration-300 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center text-zinc-600 gap-1.5 select-none">
+                        <Layers className="w-8 h-8 text-[#FF5500]" />
+                        <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
+                          No Photo Uploaded
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Badges on preview */}
+                    <div className="absolute top-3 left-3 bg-black/80 backdrop-blur-md px-2.5 py-1 rounded-md text-[10px] font-black text-zinc-300 border border-white/10">
+                      Order: #{cat.sort_order}
                     </div>
-                  )}
 
-                  {/* Badges on preview */}
-                  <div className="absolute top-3 left-3 bg-black/80 backdrop-blur-md px-2.5 py-1 rounded-md text-[10px] font-black text-zinc-300">
-                    Order: #{cat.sort_order}
+                    <div
+                      className={`absolute top-3 right-3 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${
+                        cat.is_active
+                          ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
+                          : "bg-zinc-800 text-zinc-400"
+                      }`}
+                    >
+                      {cat.is_active ? "Active" : "Hidden"}
+                    </div>
+
+                    {/* Loading Overlay */}
+                    {isThisCardUploading && (
+                      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center gap-2 text-[#FF5500] z-20">
+                        <Loader2 className="w-7 h-7 animate-spin" />
+                        <span className="text-xs font-bold uppercase tracking-wider text-white">
+                          Uploading & Saving...
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Hover 1-Click Upload Overlay */}
+                    {!isThisCardUploading && (
+                      <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2.5 p-4 z-10">
+                        <button
+                          type="button"
+                          onClick={() => cardFileInputRefs.current[cat.id]?.click()}
+                          className="px-4 py-2 rounded-xl bg-[#FF5500] hover:bg-[#FF6A1A] text-white text-xs font-black uppercase tracking-wider shadow-lg flex items-center gap-2 transition-transform hover:scale-105"
+                        >
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>Upload Photo</span>
+                        </button>
+                        <span className="text-[10px] text-zinc-400 font-medium">
+                          Supports PNG, WebP, JPG
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Hidden Direct File Input */}
+                    <input
+                      type="file"
+                      accept="image/png,image/webp,image/jpeg,image/jpg"
+                      ref={(el) => {
+                        cardFileInputRefs.current[cat.id] = el;
+                      }}
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleDirectCardUpload(cat, file);
+                          e.target.value = "";
+                        }
+                      }}
+                    />
                   </div>
 
-                  <div
-                    className={`absolute top-3 right-3 px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider ${
+                  <h3 className="text-lg font-black text-white uppercase tracking-wide">
+                    {cat.name}
+                  </h3>
+                  <p className="text-xs text-zinc-400 mt-1 line-clamp-2">
+                    {cat.short_description || "No description provided."}
+                  </p>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => handleToggleActive(cat)}
+                    className={`p-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
                       cat.is_active
-                        ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
-                        : "bg-zinc-800 text-zinc-400"
+                        ? "text-zinc-400 hover:text-white"
+                        : "text-emerald-400 hover:text-emerald-300"
                     }`}
+                    title={cat.is_active ? "Hide category" : "Make visible"}
                   >
-                    {cat.is_active ? "Active" : "Hidden"}
+                    {cat.is_active ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                    <span>{cat.is_active ? "Hide" : "Show"}</span>
+                  </button>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => cardFileInputRefs.current[cat.id]?.click()}
+                      className="p-2 rounded-lg bg-zinc-800/80 hover:bg-[#FF5500] text-zinc-300 hover:text-white transition-all text-xs font-bold flex items-center gap-1"
+                      title="Upload new image"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                      onClick={() => handleOpenEdit(cat)}
+                      className="px-3 py-1.5 rounded-lg bg-[#FF5500]/20 hover:bg-[#FF5500] text-[#FF5500] hover:text-white transition-all text-xs font-bold uppercase flex items-center gap-1.5"
+                      aria-label="Edit category"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                      <span>Edit Details</span>
+                    </button>
+
+                    <button
+                      onClick={() => setDeleteTarget(cat)}
+                      className="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors"
+                      aria-label="Delete category"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
-
-                <h3 className="text-lg font-black text-white uppercase tracking-wide">
-                  {cat.name}
-                </h3>
-                <p className="text-xs text-zinc-400 mt-1 line-clamp-2">
-                  {cat.short_description || "No description provided."}
-                </p>
               </div>
-
-              {/* Action Buttons */}
-              <div className="pt-4 border-t border-white/5 flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={() => handleToggleActive(cat)}
-                  className={`p-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-                    cat.is_active
-                      ? "text-zinc-400 hover:text-white"
-                      : "text-emerald-400 hover:text-emerald-300"
-                  }`}
-                  title={cat.is_active ? "Hide category" : "Make visible"}
-                >
-                  {cat.is_active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  <span>{cat.is_active ? "Hide" : "Show"}</span>
-                </button>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleOpenEdit(cat)}
-                    className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white transition-colors"
-                    aria-label="Edit category"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-
-                  <button
-                    onClick={() => setDeleteTarget(cat)}
-                    className="p-2 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors"
-                    aria-label="Delete category"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -346,7 +444,6 @@ export default function AdminCategoriesPage() {
       {isModalOpen && editingCat && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm overflow-y-auto">
           <div className="w-full max-w-lg bg-[#141414] border border-white/15 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 animate-in fade-in zoom-in-95 my-8">
-            
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <h3 className="text-base font-black uppercase text-white tracking-wide">
                 {editingCat.id ? `Edit: ${editingCat.name}` : "Add New RC Category"}
@@ -434,15 +531,16 @@ export default function AdminCategoriesPage() {
 
               {/* Category Image Upload */}
               <ImageUploader
-                label="Category Showcase Photo"
+                label="Category Showcase Photo (Cloudinary Upload)"
                 bucket="categories"
                 folder="category-images"
                 currentUrl={editingCat.image_url}
+                onUploadingStateChange={(loading) => setIsImageUploading(loading)}
                 onUploadSuccess={(url) =>
-                  setEditingCat({ ...editingCat, image_url: url })
+                  setEditingCat((prev) => (prev ? { ...prev, image_url: url } : null))
                 }
                 onRemove={() =>
-                  setEditingCat({ ...editingCat, image_url: null })
+                  setEditingCat((prev) => (prev ? { ...prev, image_url: null } : null))
                 }
               />
 
@@ -456,14 +554,25 @@ export default function AdminCategoriesPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={isSaving}
-                  className="px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider text-white bg-[#FF5500] hover:bg-[#FF6A1A] shadow-lg shadow-[#FF5500]/30 transition-all disabled:opacity-50"
+                  disabled={isSaving || isImageUploading}
+                  className="px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider text-white bg-[#FF5500] hover:bg-[#FF6A1A] shadow-lg shadow-[#FF5500]/30 transition-all disabled:opacity-50 flex items-center gap-2"
                 >
-                  {isSaving ? "Saving..." : "Save Category"}
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Saving to DB...</span>
+                    </>
+                  ) : isImageUploading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Uploading Image...</span>
+                    </>
+                  ) : (
+                    <span>Save Category</span>
+                  )}
                 </button>
               </div>
             </form>
-
           </div>
         </div>
       )}

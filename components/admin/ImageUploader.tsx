@@ -10,6 +10,7 @@ interface ImageUploaderProps {
   folder?: string;
   label?: string;
   onUploadSuccess: (url: string) => void;
+  onUploadingStateChange?: (isUploading: boolean) => void;
   onRemove?: () => void;
 }
 
@@ -18,6 +19,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   folder = "uploads",
   label = "Upload Image (Cloudinary)",
   onUploadSuccess,
+  onUploadingStateChange,
   onRemove,
 }) => {
   const [isUploading, setIsUploading] = useState(false);
@@ -52,6 +54,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
 
     // 3. Upload to Cloudinary via server route /api/upload
     setIsUploading(true);
+    if (onUploadingStateChange) onUploadingStateChange(true);
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -76,6 +79,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
       setErrorMsg(err.message || "Failed to upload image to Cloudinary");
     } finally {
       setIsUploading(false);
+      if (onUploadingStateChange) onUploadingStateChange(false);
     }
   };
 

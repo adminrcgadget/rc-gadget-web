@@ -6,9 +6,8 @@ export const defaultNavigationItems: NavigationItem[] = [
   { id: "2", label: "Our World", href: "#our-world", sort_order: 2, is_visible: true, created_at: "", updated_at: "" },
   { id: "3", label: "Coming Soon", href: "#coming-soon", sort_order: 3, is_visible: true, created_at: "", updated_at: "" },
   { id: "4", label: "About", href: "#about", sort_order: 4, is_visible: true, created_at: "", updated_at: "" },
-  { id: "5", label: "Features", href: "#features", sort_order: 5, is_visible: true, created_at: "", updated_at: "" },
-  { id: "6", label: "Experience", href: "#experience", sort_order: 6, is_visible: true, created_at: "", updated_at: "" },
-  { id: "7", label: "Contact", href: "#contact", sort_order: 7, is_visible: true, created_at: "", updated_at: "" },
+  { id: "6", label: "Experience", href: "#experience", sort_order: 5, is_visible: true, created_at: "", updated_at: "" },
+  { id: "7", label: "Contact", href: "#contact", sort_order: 6, is_visible: true, created_at: "", updated_at: "" },
 ];
 
 export async function getNavigationItems(): Promise<NavigationItem[]> {

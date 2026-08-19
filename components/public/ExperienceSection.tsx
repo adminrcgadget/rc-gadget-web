@@ -40,21 +40,21 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experience
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Centered Section Header with Orange Flanking Lines */}
-        <div className="flex flex-col items-center justify-center mb-8 select-none">
+        <div className="flex flex-col items-center justify-center mb-6 sm:mb-8 select-none">
           <div className="flex items-center justify-center gap-3 sm:gap-4">
-            <div className="w-8 sm:w-16 h-0.5 bg-gradient-to-r from-transparent to-[#FF5A00]" />
+            <div className="w-6 sm:w-16 h-0.5 bg-gradient-to-r from-transparent to-[#FF5A00]" />
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-black italic uppercase text-[#111111] tracking-widest text-center">
               EXPERIENCE <span className="text-[#FF5A00]">THE THRILL</span>
             </h2>
-            <div className="w-8 sm:w-16 h-0.5 bg-gradient-to-l from-transparent to-[#FF5A00]" />
+            <div className="w-6 sm:w-16 h-0.5 bg-gradient-to-l from-transparent to-[#FF5A00]" />
           </div>
-          <p className="text-[11px] sm:text-xs text-gray-500 mt-1.5 font-medium">
-            Explore Our Premium RC Collection
+          <p className="text-[11px] sm:text-xs text-gray-500 mt-1.5 font-medium text-center">
+            Explore Our Premium RC Tracks & Collections
           </p>
         </div>
 
         {/* 2 Big Cinematic Track Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 lg:gap-8">
           {uniqueItems.map((exp: any, idx: number) => {
             const trackImg =
               exp.image_url && !exp.image_url.includes("WhatsApp")
@@ -67,10 +67,10 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experience
               <Link
                 key={exp.id || idx}
                 href={exp.button_url || "#contact"}
-                className="group relative rounded-2xl bg-[#0D0F12] border border-[#FF5A00]/40 hover:border-[#FF5A00] p-2.5 sm:p-3 shadow-2xl shadow-black/80 transition-all duration-500 overflow-hidden block"
+                className="group relative rounded-2xl bg-[#0D0F12] border border-[#FF5A00]/40 hover:border-[#FF5A00] p-2.5 sm:p-3 shadow-xl shadow-black/60 transition-all duration-500 overflow-hidden block active:scale-[0.99]"
               >
                 {/* Photo Showcase Container */}
-                <div className="relative w-full aspect-[16/9] sm:aspect-[16/8.5] rounded-xl overflow-hidden bg-black">
+                <div className="relative w-full aspect-[16/10] sm:aspect-[16/9] rounded-xl overflow-hidden bg-black">
                   <Image
                     src={trackImg}
                     alt={exp.title}
@@ -80,10 +80,10 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experience
                   />
 
                   {/* Dark gradient overlay for bottom text */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
 
                   {/* Top-Left Orange Badge */}
-                  <div className="absolute top-3 left-3 w-8 h-8 rounded-lg bg-black/60 backdrop-blur-md border border-[#FF5A00]/70 flex items-center justify-center text-[#FF5A00] shadow-md">
+                  <div className="absolute top-3 left-3 w-8 h-8 rounded-lg bg-black/70 backdrop-blur-md border border-[#FF5A00]/70 flex items-center justify-center text-[#FF5A00] shadow-md">
                     {idx === 0 ? (
                       <svg viewBox="0 0 24 24" className="w-4 h-4 text-[#FF5A00]" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.6C1.4 11.1 1 11.8 1 12.6V16c0 .6.4 1 1 1h2" />
@@ -103,18 +103,20 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({ experience
                   </div>
 
                   {/* Bottom Text & Circular Arrow Overlay */}
-                  <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between">
+                  <div className="absolute bottom-3.5 left-3.5 right-3.5 flex items-end justify-between">
                     <div>
-                      <h3 className="text-sm sm:text-base font-black italic uppercase text-[#F5F5F5] tracking-wide">
+                      <h3 className="text-sm sm:text-base font-black italic uppercase text-white tracking-wide">
                         {exp.title}
                       </h3>
-                      <p className="text-[10px] sm:text-xs font-bold italic uppercase text-[#A5A5A5] tracking-wider mt-0.5">
-                        {exp.subtitle}
-                      </p>
+                      <div className="inline-block mt-0.5 pb-0.5 border-b-2 border-[#FF5A00]">
+                        <p className="text-[10px] sm:text-xs font-black uppercase text-zinc-200 tracking-wider">
+                          {idx === 0 ? "BUILT FOR SPEED" : "BUILT FOR EXTREME FUN"}
+                        </p>
+                      </div>
                     </div>
 
-                    <div className="w-7 h-7 rounded-full border border-[#FF5A00] flex items-center justify-center text-[#FF5A00] group-hover:bg-[#FF5A00] group-hover:text-white transition-all shadow-md">
-                      <ArrowRight className="w-3.5 h-3.5" />
+                    <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#FF5A00] flex items-center justify-center text-white transition-transform group-hover:scale-110 shadow-lg shadow-[#FF5A00]/40 shrink-0">
+                      <ArrowRight className="w-4 h-4" />
                     </div>
                   </div>
 
