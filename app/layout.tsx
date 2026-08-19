@@ -50,9 +50,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${montserrat.variable} ${orbitron.variable} dark scroll-smooth`}
     >
-      <body className="min-h-screen bg-[#050505] text-[#F5F5F5] font-sans antialiased selection:bg-[#FF5A00] selection:text-black">
+      <body
+        suppressHydrationWarning
+        className="min-h-screen bg-[#050505] text-[#F5F5F5] font-sans antialiased selection:bg-[#FF5A00] selection:text-black"
+      >
         {children}
       </body>
     </html>
