@@ -130,7 +130,7 @@ export const Footer: React.FC<FooterProps> = ({
               onClick={() => toggleSection("contact-info")}
               className="w-full px-5 py-4 flex items-center justify-between text-left text-xs font-black uppercase tracking-wider text-white select-none active:bg-zinc-900/60"
             >
-              <span>CONTACT & LOCATION</span>
+              <span>LOCATIONS & CONTACT</span>
               <ChevronDown
                 className={`w-4 h-4 text-[#FF5A00] transition-transform duration-300 ${
                   openSection === "contact-info" ? "rotate-180" : ""
@@ -138,18 +138,55 @@ export const Footer: React.FC<FooterProps> = ({
               />
             </button>
             {openSection === "contact-info" && (
-              <div className="px-5 pb-4 pt-2 border-t border-zinc-900/80 space-y-3 text-xs text-zinc-400">
-                <div className="flex items-start gap-2.5">
-                  <MapPin className="w-4 h-4 text-[#FF5A00] shrink-0 mt-0.5" />
-                  <span>Kottakkal, Parambilangadi, Malappuram, Kerala, India</span>
+              <div className="px-5 pb-4 pt-2 border-t border-zinc-900/80 space-y-4 text-xs text-zinc-400">
+                {/* Main Store */}
+                <div className="space-y-1">
+                  <div className="flex items-start gap-2.5">
+                    <MapPin className="w-4 h-4 text-[#FF5A00] shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-bold text-white block">Main Hub — Kottakkal</span>
+                      <span>Parambilangadi, Malappuram, Kerala</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2.5">
-                  <Phone className="w-4 h-4 text-[#FF5A00] shrink-0" />
-                  <a href="tel:+917510110155" className="hover:text-white">+91 75 101 101 55</a>
+
+                {/* Upcoming Branches */}
+                <div className="space-y-2 pt-2 border-t border-zinc-900">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#FF5A00] block">
+                    Upcoming Branches
+                  </span>
+                  
+                  <div className="flex items-center justify-between gap-2 py-0.5">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+                      <span className="text-zinc-300 font-medium">HiLITE Mall, Calicut</span>
+                    </div>
+                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-[#FF5A00]/20 text-[#FF5A00] border border-[#FF5A00]/30 shrink-0">
+                      Coming Soon
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 py-0.5">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+                      <span className="text-zinc-300 font-medium">Mini Ooty, Vengara</span>
+                    </div>
+                    <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-[#FF5A00]/20 text-[#FF5A00] border border-[#FF5A00]/30 shrink-0">
+                      Coming Soon
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2.5">
-                  <Mail className="w-4 h-4 text-[#FF5A00] shrink-0" />
-                  <a href="mailto:rcgadgetsstore@gmail.com" className="hover:text-white">rcgadgetsstore@gmail.com</a>
+
+                {/* Contact links */}
+                <div className="space-y-2 pt-2 border-t border-zinc-900">
+                  <div className="flex items-center gap-2.5">
+                    <Phone className="w-4 h-4 text-[#FF5A00] shrink-0" />
+                    <a href="tel:+917510110155" className="hover:text-white font-semibold text-zinc-300">+91 75 101 101 55</a>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <Mail className="w-4 h-4 text-[#FF5A00] shrink-0" />
+                    <a href="mailto:rcgadgetsstore@gmail.com" className="hover:text-white">rcgadgetsstore@gmail.com</a>
+                  </div>
                 </div>
               </div>
             )}
@@ -199,35 +236,77 @@ export const Footer: React.FC<FooterProps> = ({
             </ul>
           </div>
 
-          {/* CONTACT DETAILS */}
+          {/* STORE LOCATIONS */}
           <div className="space-y-4">
             <h4 className="text-xs font-black text-white uppercase tracking-widest">
-              STORE LOCATION
+              OUR LOCATIONS
+            </h4>
+            <div className="space-y-3.5 text-xs text-zinc-400">
+              {/* Active Kottakkal Store */}
+              <div className="space-y-1">
+                <div className="flex items-start gap-2.5">
+                  <MapPin className="w-4 h-4 text-[#FF5A00] shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-bold text-white block">Main Hub — Kottakkal</span>
+                    <span className="text-[11px] text-zinc-400 leading-snug block">
+                      Parambilangadi, Malappuram, Kerala
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Upcoming Calicut */}
+              <div className="space-y-1 pt-2 border-t border-zinc-900">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-start gap-2">
+                    <MapPin className="w-3.5 h-3.5 text-zinc-500 shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-semibold text-zinc-300 block">HiLITE Mall</span>
+                      <span className="text-[10px] text-zinc-500">Calicut, Kerala</span>
+                    </div>
+                  </div>
+                  <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-[#FF5A00]/20 text-[#FF5A00] border border-[#FF5A00]/30 shrink-0">
+                    Coming Soon
+                  </span>
+                </div>
+              </div>
+
+              {/* Upcoming Mini Ooty Vengara */}
+              <div className="space-y-1 pt-2 border-t border-zinc-900">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-start gap-2">
+                    <MapPin className="w-3.5 h-3.5 text-zinc-500 shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-semibold text-zinc-300 block">Mini Ooty</span>
+                      <span className="text-[10px] text-zinc-500">Vengara, Malappuram</span>
+                    </div>
+                  </div>
+                  <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-[#FF5A00]/20 text-[#FF5A00] border border-[#FF5A00]/30 shrink-0">
+                    Coming Soon
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* CONTACT & GET IN TOUCH */}
+          <div className="space-y-4">
+            <h4 className="text-xs font-black text-white uppercase tracking-widest">
+              GET IN TOUCH
             </h4>
             <div className="space-y-3 text-xs text-zinc-400">
-              <div className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-[#FF5A00] shrink-0 mt-0.5" />
-                <span>Kottakkal, Parambilangadi, Malappuram, Kerala, India</span>
-              </div>
               <div className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-[#FF5A00] shrink-0" />
-                <a href="tel:+917510110155" className="hover:text-white">+91 75 101 101 55</a>
+                <a href="tel:+917510110155" className="hover:text-white font-semibold text-zinc-300">+91 75 101 101 55</a>
               </div>
               <div className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-[#FF5A00] shrink-0" />
                 <a href="mailto:rcgadgetsstore@gmail.com" className="hover:text-white">rcgadgetsstore@gmail.com</a>
               </div>
+              <p className="text-[11px] text-zinc-500 pt-1 leading-relaxed">
+                First in Malappuram. Experience high-octane RC motorsport & hobby-grade vehicles.
+              </p>
             </div>
-          </div>
-
-          {/* WORKING HOURS & ABOUT */}
-          <div className="space-y-4">
-            <h4 className="text-xs font-black text-white uppercase tracking-widest">
-              ABOUT RC GADGETS
-            </h4>
-            <p className="text-xs text-zinc-400 leading-relaxed">
-              First in Malappuram. Experience high-octane RC motorsport, hobby grade radio models, precision vehicles & adventure tracks right in Kottakkal.
-            </p>
           </div>
 
         </div>
