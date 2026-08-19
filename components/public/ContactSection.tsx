@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import { SiteSettings, SocialLink } from "@/types/database";
 import { MapPin, Phone, Mail, MessageSquare } from "lucide-react";
 import { renderSocialBrandIcon } from "@/components/ui/SocialIcons";
@@ -28,76 +27,52 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ settings, social
         
         {/* 1. Dark Hero Callout Panel */}
         <div className="relative rounded-3xl bg-[#0D0F12] border border-zinc-800 p-6 sm:p-10 lg:p-12 shadow-2xl shadow-black/80 overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-12 items-center gap-8 relative z-10">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative z-10">
             
-            {/* Left Column: Headlines, Subtext & Action Buttons */}
-            <div className="lg:col-span-7 space-y-4">
+            {/* Left Side: Headlines & Subtext */}
+            <div className="space-y-4 max-w-2xl">
               {/* Headline */}
-              <div className="space-y-0.5 font-black italic uppercase tracking-tight select-none">
+              <div className="space-y-1 font-black italic uppercase tracking-tight select-none">
                 <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black italic text-white leading-[0.95]">
-                  READY TO
+                  READY TO EXPERIENCE RC
                 </h2>
-                <div className="text-3xl sm:text-4xl lg:text-5xl font-black italic text-white leading-[0.95]">
-                  EXPERIENCE RC
-                </div>
                 <div className="text-3xl sm:text-4xl lg:text-5xl font-black italic text-[#FF5A00] leading-[0.95]">
                   LIKE NEVER BEFORE?
                 </div>
               </div>
 
               {/* Orange bar */}
-              <div className="h-0.5 w-10 bg-[#FF5A00]" />
+              <div className="h-0.5 w-12 bg-[#FF5A00]" />
 
               {/* Subtext */}
-              <p className="text-xs sm:text-sm text-zinc-400 font-normal leading-relaxed pt-1 max-w-lg">
-                Visit our track and showroom in Kottakkal or connect with our team for consultations, custom builds & test drives.
+              <p className="text-xs sm:text-sm text-zinc-400 font-normal leading-relaxed pt-1">
+                Visit our showroom &amp; tracks in Kottakkal or connect with our team for consultations, custom builds &amp; test drives.
               </p>
-
-              {/* 2 Big Action Buttons */}
-              <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 max-w-md">
-                <a
-                  href={`tel:${rawPhone}`}
-                  className="px-6 py-3.5 rounded-2xl bg-[#FF5A00] hover:bg-[#FF6A00] text-white transition-all duration-300 font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-3 shadow-lg shadow-[#FF5A00]/30 active:scale-[0.98]"
-                >
-                  <Phone className="w-4 h-4 fill-white" />
-                  <span>CALL NOW {phoneNum}</span>
-                </a>
-
-                <a
-                  href={
-                    settings.whatsapp_number
-                      ? `https://wa.me/${settings.whatsapp_number.replace(/[^0-9]/g, "")}`
-                      : "https://wa.me/917510110155"
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-6 py-3.5 rounded-2xl bg-white hover:bg-zinc-100 text-zinc-900 transition-all duration-300 font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-md active:scale-[0.98]"
-                >
-                  <MessageSquare className="w-4 h-4 text-zinc-900 fill-zinc-900" />
-                  <span>WHATSAPP US</span>
-                </a>
-              </div>
             </div>
 
-            {/* Right Column (Desktop Only): High-Impact Vehicle Fleet Artwork Showcase */}
-            <div className="hidden lg:flex lg:col-span-5 flex-col items-center justify-center relative w-full h-64 xl:h-72">
-              <div className="relative w-full h-full rounded-2xl overflow-hidden bg-gradient-to-r from-black/40 to-transparent border border-zinc-800/60 p-2 group">
-                <Image
-                  src="/assets/coming-soon-perfect-strip.webp"
-                  alt="RC Gadgets Fleet"
-                  fill
-                  sizes="500px"
-                  className="object-cover object-center rounded-xl transition-transform duration-700 group-hover:scale-105"
-                />
-                {/* Subtle dark gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none" />
-                
-                {/* Bottom Badge */}
-                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-zinc-300 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10">
-                  <span>Kottakkal Track & Store</span>
-                  <span className="text-[#FF5A00]">Open Today</span>
-                </div>
-              </div>
+            {/* Right Side: 2 Big Action Buttons (No text break) */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 shrink-0">
+              <a
+                href={`tel:${rawPhone}`}
+                className="px-6 py-4 rounded-2xl bg-[#FF5A00] hover:bg-[#FF6A00] text-white transition-all duration-300 font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-lg shadow-[#FF5A00]/30 active:scale-[0.98] whitespace-nowrap"
+              >
+                <Phone className="w-4 h-4 fill-white shrink-0" />
+                <span className="whitespace-nowrap">CALL NOW +91 {phoneNum}</span>
+              </a>
+
+              <a
+                href={
+                  settings.whatsapp_number
+                    ? `https://wa.me/${settings.whatsapp_number.replace(/[^0-9]/g, "")}`
+                    : "https://wa.me/917510110155"
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-4 rounded-2xl bg-white hover:bg-zinc-100 text-zinc-900 transition-all duration-300 font-black text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-md active:scale-[0.98] whitespace-nowrap"
+              >
+                <MessageSquare className="w-4 h-4 text-zinc-900 fill-zinc-900 shrink-0" />
+                <span className="whitespace-nowrap">WHATSAPP US</span>
+              </a>
             </div>
 
           </div>
