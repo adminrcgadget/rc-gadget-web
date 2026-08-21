@@ -5,114 +5,207 @@ import { AdminHeader } from "@/components/admin/AdminHeader";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import { createClient } from "@/lib/supabase/client";
 import { HeroSection } from "@/types/database";
-import { Save, Check, AlertCircle, Loader2 } from "lucide-react";
+import {
+  Save,
+  Check,
+  AlertCircle,
+  Loader2,
+  Sparkles,
+  Smartphone,
+  Monitor,
+  Eye,
+  Layers,
+} from "lucide-react";
 
 export default function AdminHeroPage() {
-  const [hero, setHero] = useState<HeroSection | null>(null);
+  const [slides, setSlides] = useState<HeroSection[]>([]);
+  const [activeTab, setActiveTab] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [statusMsg, setStatusMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [savingSlide, setSavingSlide] = useState<number | null>(null);
+  const [statusMsg, setStatusMsg] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   const supabase = createClient();
 
-  useEffect(() => {
-    const fetchHero = async () => {
-      setIsLoading(true);
-      try {
-        const { data, error } = await supabase
-          .from("hero_section")
-          .select("*")
-          .limit(1)
-          .maybeSingle();
-
-        if (data) {
-          setHero(data as HeroSection);
-        } else {
-          // No row exists yet — insert a blank starter row in DB so future saves work
-          const newHero: Omit<HeroSection, "id" | "created_at" | "updated_at"> = {
-            eyebrow: "KOTTAKKAL — FIRST IN MALAPPURAM",
-            heading_line_1: "YOUR WORLD OF",
-            heading_line_2: "REMOTE",
-            heading_line_3: "CONTROL",
-            description: "Where passion meets performance. Experience high-octane RC motorsport, scale engineering marvels, and professional racing tracks right here in Kottakkal.",
-            highlighted_text: "WHERE PASSION MEETS PERFORMANCE",
-            primary_button_text: "Explore Our World",
-            primary_button_url: "#our-world",
-            secondary_button_text: "Experience Tracks",
-            secondary_button_url: "#experience",
-            background_image_url: null,
-            foreground_image_url: null,
-            is_active: true,
-          };
-          const { data: inserted, error: insertError } = await supabase
-            .from("hero_section")
-            .insert(newHero as any)
-            .select()
-            .single();
-          if (inserted && !insertError) {
-            setHero(inserted as HeroSection);
-          } else {
-            // Fallback: set local state only so admin form is still usable
-            setHero({ ...newHero, id: "", created_at: new Date().toISOString(), updated_at: new Date().toISOString() } as HeroSection);
-          }
-        }
-      } catch (err) {
-        console.error("Error fetching hero:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchHero();
-  }, [supabase]);
-
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!hero) return;
-
-    setIsSaving(true);
-    setStatusMsg(null);
-
+  const fetchHeroSlides = async () => {
+    setIsLoading(true);
     try {
-      const payload = { ...hero, updated_at: new Date().toISOString() };
-      if (!payload.id || typeof payload.id !== "string" || payload.id.trim() === "") {
-        delete (payload as any).id;
-      }
-
-      const { data: savedData, error } = await supabase
+      const { data, error } = await supabase
         .from("hero_section")
-        .upsert(payload as any)
-        .select()
-        .maybeSingle();
+        .select("*")
+        .order("created_at", { ascending: true });
 
-      if (error) {
-        setStatusMsg({ type: "error", text: error.message });
-      } else {
-        if (savedData) {
-          setHero(savedData as HeroSection);
-        }
-        setStatusMsg({ type: "success", text: "Hero section updated successfully!" });
-      }
-    } catch (err: any) {
-      setStatusMsg({ type: "error", text: err.message || "Failed to update hero" });
+      const dbSlides = (data || []) as any[];
+
+      // Always guarantee 3 Hero Slides
+      const threeSlides: HeroSection[] = [
+        {
+          id: dbSlides[0]?.id || "slide-1",
+          heading_line_1: dbSlides[0]?.heading_line_1 || "Hero Slide 1",
+          heading_line_2: dbSlides[0]?.heading_line_2 || "REMOTE",
+          heading_line_3: dbSlides[0]?.heading_line_3 || "CONTROL",
+          eyebrow: dbSlides[0]?.eyebrow || "KOTTAKKAL — FIRST IN MALAPPURAM",
+          description: dbSlides[0]?.description || "",
+          highlighted_text: "FULL_BANNER",
+          primary_button_text: dbSlides[0]?.primary_button_text || "SHOP NOW",
+          primary_button_url:
+            dbSlides[0]?.primary_button_url || "#shop-by-category",
+          secondary_button_text: dbSlides[0]?.secondary_button_text || "CONTACT US",
+          secondary_button_url: dbSlides[0]?.secondary_button_url || "#contact",
+          background_image_url: dbSlides[0]?.background_image_url || null,
+          foreground_image_url: dbSlides[0]?.foreground_image_url || null,
+          is_active: dbSlides[0]?.is_active ?? true,
+          created_at: dbSlides[0]?.created_at || new Date().toISOString(),
+          updated_at: dbSlides[0]?.updated_at || new Date().toISOString(),
+        },
+        {
+          id: dbSlides[1]?.id || "slide-2",
+          heading_line_1: dbSlides[1]?.heading_line_1 || "Hero Slide 2",
+          heading_line_2: dbSlides[1]?.heading_line_2 || "PRO SPEED",
+          heading_line_3: dbSlides[1]?.heading_line_3 || "TRACKS",
+          eyebrow: dbSlides[1]?.eyebrow || "EXPERIENCE THE THRILL",
+          description: dbSlides[1]?.description || "",
+          highlighted_text: "FULL_BANNER",
+          primary_button_text: dbSlides[1]?.primary_button_text || "EXPLORE TRACKS",
+          primary_button_url: dbSlides[1]?.primary_button_url || "#experience",
+          secondary_button_text: dbSlides[1]?.secondary_button_text || "CONTACT US",
+          secondary_button_url: dbSlides[1]?.secondary_button_url || "#contact",
+          background_image_url: dbSlides[1]?.background_image_url || null,
+          foreground_image_url: dbSlides[1]?.foreground_image_url || null,
+          is_active: dbSlides[1]?.is_active ?? true,
+          created_at: dbSlides[1]?.created_at || new Date(Date.now() + 1000).toISOString(),
+          updated_at: dbSlides[1]?.updated_at || new Date().toISOString(),
+        },
+        {
+          id: dbSlides[2]?.id || "slide-3",
+          heading_line_1: dbSlides[2]?.heading_line_1 || "Hero Slide 3",
+          heading_line_2: dbSlides[2]?.heading_line_2 || "NEW HOBBY",
+          heading_line_3: dbSlides[2]?.heading_line_3 || "ARRIVALS",
+          eyebrow: dbSlides[2]?.eyebrow || "FIRST IN MALAPPURAM",
+          description: dbSlides[2]?.description || "",
+          highlighted_text: "FULL_BANNER",
+          primary_button_text: dbSlides[2]?.primary_button_text || "VIEW PRODUCTS",
+          primary_button_url: dbSlides[2]?.primary_button_url || "#featured-products",
+          secondary_button_text: dbSlides[2]?.secondary_button_text || "GET IN TOUCH",
+          secondary_button_url: dbSlides[2]?.secondary_button_url || "#contact",
+          background_image_url: dbSlides[2]?.background_image_url || null,
+          foreground_image_url: dbSlides[2]?.foreground_image_url || null,
+          is_active: dbSlides[2]?.is_active ?? true,
+          created_at: dbSlides[2]?.created_at || new Date(Date.now() + 2000).toISOString(),
+          updated_at: dbSlides[2]?.updated_at || new Date().toISOString(),
+        },
+      ];
+
+      setSlides(threeSlides);
+    } catch (err) {
+      console.error("Error fetching hero slides:", err);
     } finally {
-      setIsSaving(false);
+      setIsLoading(false);
     }
   };
 
-  if (isLoading || !hero) {
-    return (
-      <div className="p-8 flex items-center justify-center min-h-[400px]">
-        <Loader2 className="w-8 h-8 text-[#FF5500] animate-spin" />
-      </div>
+  useEffect(() => {
+    fetchHeroSlides();
+  }, []);
+
+  const handleSaveSlide = async (index: number) => {
+    const slide = slides[index];
+    if (!slide) return;
+
+    setSavingSlide(index);
+    setStatusMsg(null);
+
+    try {
+      const payload: any = {
+        heading_line_1: slide.heading_line_1 || `Hero Slide ${index + 1}`,
+        heading_line_2: slide.heading_line_2 || "REMOTE",
+        heading_line_3: slide.heading_line_3 || "CONTROL",
+        eyebrow: slide.eyebrow || "KOTTAKKAL — FIRST IN MALAPPURAM",
+        description: slide.description || "",
+        highlighted_text: "FULL_BANNER",
+        primary_button_text: slide.primary_button_text || "SHOP NOW",
+        primary_button_url:
+          typeof slide.primary_button_url === "string" &&
+          slide.primary_button_url.trim().length > 0
+            ? slide.primary_button_url.trim()
+            : "#shop-by-category",
+        secondary_button_text: slide.secondary_button_text || "CONTACT US",
+        secondary_button_url: slide.secondary_button_url || "#contact",
+        background_image_url:
+          typeof slide.background_image_url === "string" &&
+          slide.background_image_url.trim().length > 0
+            ? slide.background_image_url.trim()
+            : null,
+        foreground_image_url:
+          typeof slide.foreground_image_url === "string" &&
+          slide.foreground_image_url.trim().length > 0
+            ? slide.foreground_image_url.trim()
+            : null,
+        is_active: slide.is_active ?? true,
+        updated_at: new Date().toISOString(),
+      };
+
+      const isUuid =
+        slide.id &&
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          slide.id
+        );
+
+      if (isUuid) {
+        payload.id = slide.id;
+        const { error } = await (supabase.from("hero_section") as any)
+          .upsert(payload)
+          .select();
+        if (error) throw error;
+      } else {
+        const { data, error } = await (supabase.from("hero_section") as any)
+          .insert(payload)
+          .select()
+          .single();
+        if (error) throw error;
+        if (data) {
+          setSlides((prev) =>
+            prev.map((s, i) => (i === index ? { ...s, id: data.id } : s))
+          );
+        }
+      }
+
+      setStatusMsg({
+        type: "success",
+        text: `Hero Slide ${index + 1} saved and published live!`,
+      });
+    } catch (err: any) {
+      console.error("Error saving hero slide:", err);
+      setStatusMsg({
+        type: "error",
+        text: err.message || `Failed to save Hero Slide ${index + 1}`,
+      });
+    } finally {
+      setSavingSlide(null);
+    }
+  };
+
+  const updateSlideField = (
+    index: number,
+    field: keyof HeroSection,
+    value: any
+  ) => {
+    setSlides((prev) =>
+      prev.map((item, idx) =>
+        idx === index ? { ...item, [field]: value } : item
+      )
     );
-  }
+  };
+
+  const currentSlide = slides[activeTab];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 bg-black">
       <AdminHeader
-        title="Hero Section CMS"
-        subtitle="Manage cinematic headline typography, RC vehicle artwork, CTAs, and background visuals"
+        title="3 Hero Banner Slides Management (Auto-Slide)"
+        subtitle="Manage up to 3 rotating hero banners with separate desktop and mobile creative uploads, custom action links, and auto-play carousel support"
       />
 
       {statusMsg && (
@@ -132,230 +225,235 @@ export default function AdminHeroPage() {
         </div>
       )}
 
-      <form onSubmit={handleSave} className="space-y-8">
-        {/* Typography & Content */}
-        <div className="rounded-3xl bg-[#0E0E0E] border border-white/10 p-6 sm:p-8 space-y-6">
-          <h3 className="text-sm font-black uppercase tracking-wider text-white border-l-2 border-[#FF5500] pl-3">
-            Cinematic Headlines & Text
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-1.5">
-              <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
-                Eyebrow Badge Text
-              </label>
-              <input
-                type="text"
-                value={hero.eyebrow || ""}
-                onChange={(e) => setHero({ ...hero, eyebrow: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl bg-[#141414] border border-white/10 focus:border-[#FF5500] text-white text-sm outline-none"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
-                Highlighted Tagline / Quote
-              </label>
-              <input
-                type="text"
-                value={hero.highlighted_text || ""}
-                onChange={(e) =>
-                  setHero({ ...hero, highlighted_text: e.target.value })
-                }
-                className="w-full px-4 py-3 rounded-xl bg-[#141414] border border-white/10 focus:border-[#FF5500] text-white text-sm outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div className="space-y-1.5">
-              <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
-                Heading Line 1 (White)
-              </label>
-              <input
-                type="text"
-                required
-                value={hero.heading_line_1 || ""}
-                onChange={(e) =>
-                  setHero({ ...hero, heading_line_1: e.target.value })
-                }
-                className="w-full px-4 py-3 rounded-xl bg-[#141414] border border-white/10 focus:border-[#FF5500] text-white text-sm outline-none"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-black uppercase tracking-wider text-[#FF5500]">
-                Heading Line 2 (Orange Accent)
-              </label>
-              <input
-                type="text"
-                value={hero.heading_line_2 || ""}
-                onChange={(e) =>
-                  setHero({ ...hero, heading_line_2: e.target.value })
-                }
-                className="w-full px-4 py-3 rounded-xl bg-[#141414] border border-white/10 focus:border-[#FF5500] text-white text-sm outline-none"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
-                Heading Line 3 (Metallic)
-              </label>
-              <input
-                type="text"
-                value={hero.heading_line_3 || ""}
-                onChange={(e) =>
-                  setHero({ ...hero, heading_line_3: e.target.value })
-                }
-                className="w-full px-4 py-3 rounded-xl bg-[#141414] border border-white/10 focus:border-[#FF5500] text-white text-sm outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
-              Hero Narrative Description
-            </label>
-            <textarea
-              rows={3}
-              value={hero.description || ""}
-              onChange={(e) =>
-                setHero({ ...hero, description: e.target.value })
-              }
-              className="w-full px-4 py-3 rounded-xl bg-[#141414] border border-white/10 focus:border-[#FF5500] text-white text-sm outline-none resize-none"
-            />
-          </div>
+      {isLoading ? (
+        <div className="p-16 flex justify-center">
+          <Loader2 className="w-8 h-8 text-[#FF5A00] animate-spin" />
         </div>
+      ) : (
+        <div className="space-y-8">
+          {/* Slide Navigation Tabs */}
+          <div className="flex items-center gap-3 border-b border-zinc-800 pb-4 overflow-x-auto">
+            {slides.map((slide, idx) => {
+              const hasImg = Boolean(slide.background_image_url);
+              const isActiveTab = activeTab === idx;
 
-        {/* Buttons & Links */}
-        <div className="rounded-3xl bg-[#0E0E0E] border border-white/10 p-6 sm:p-8 space-y-6">
-          <h3 className="text-sm font-black uppercase tracking-wider text-white border-l-2 border-[#FF5500] pl-3">
-            Call To Action Buttons
-          </h3>
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setActiveTab(idx)}
+                  className={`px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center gap-2.5 transition-all cursor-pointer ${
+                    isActiveTab
+                      ? "bg-[#FF5A00] text-white shadow-lg shadow-[#FF5A00]/25"
+                      : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700"
+                  }`}
+                >
+                  <div
+                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${
+                      isActiveTab
+                        ? "bg-white text-[#FF5A00]"
+                        : "bg-zinc-800 text-zinc-400"
+                    }`}
+                  >
+                    {idx + 1}
+                  </div>
+                  <span>Slide {idx + 1}</span>
+                  {hasImg && (
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-4 rounded-2xl bg-[#141414] border border-white/5 space-y-4">
-              <span className="text-xs font-black text-[#FF5500] uppercase tracking-wider block">
-                Primary Button
-              </span>
-              <div className="space-y-1.5">
-                <label className="text-xs text-zinc-400">Button Label</label>
-                <input
-                  type="text"
-                  value={hero.primary_button_text || ""}
-                  onChange={(e) =>
-                    setHero({ ...hero, primary_button_text: e.target.value })
-                  }
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#1A1A1A] border border-white/10 focus:border-[#FF5500] text-white text-sm outline-none"
-                />
+          {currentSlide && (
+            <div className="space-y-8 animate-in fade-in">
+              {/* Banner Uploaders */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Desktop Hero Banner */}
+                <div className="rounded-3xl bg-[#0A0A0A] border border-zinc-800/90 p-6 space-y-4 shadow-2xl flex flex-col justify-between">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+                      <div className="flex items-center gap-2 text-white">
+                        <Monitor className="w-4 h-4 text-[#FF5A00]" />
+                        <h3 className="text-xs font-black uppercase tracking-wider">
+                          Slide {activeTab + 1}: Desktop Hero Banner Image
+                        </h3>
+                      </div>
+                      <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        Full Width (Zero Crop)
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-zinc-400 leading-relaxed">
+                      Upload your designed desktop banner for Slide {activeTab + 1}. The storefront displays this banner with 100% natural width &amp; auto height without any cropping.
+                    </p>
+
+                    <ImageUploader
+                      folder="hero"
+                      label=""
+                      currentUrl={currentSlide.background_image_url}
+                      onUploadSuccess={(url) =>
+                        updateSlideField(activeTab, "background_image_url", url)
+                      }
+                      onRemove={() =>
+                        updateSlideField(activeTab, "background_image_url", null)
+                      }
+                    />
+                  </div>
+                </div>
+
+                {/* Mobile Hero Banner */}
+                <div className="rounded-3xl bg-[#0A0A0A] border border-zinc-800/90 p-6 space-y-4 shadow-2xl flex flex-col justify-between">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+                      <div className="flex items-center gap-2 text-white">
+                        <Smartphone className="w-4 h-4 text-[#FF5A00]" />
+                        <h3 className="text-xs font-black uppercase tracking-wider">
+                          Slide {activeTab + 1}: Mobile Banner Image (Optional)
+                        </h3>
+                      </div>
+                      <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">
+                        Phone Optimized
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-zinc-400 leading-relaxed">
+                      Optional dedicated mobile creative for Slide {activeTab + 1}. If left blank, the desktop banner will automatically scale down proportionally.
+                    </p>
+
+                    <ImageUploader
+                      folder="hero"
+                      label=""
+                      currentUrl={currentSlide.foreground_image_url}
+                      onUploadSuccess={(url) =>
+                        updateSlideField(activeTab, "foreground_image_url", url)
+                      }
+                      onRemove={() =>
+                        updateSlideField(activeTab, "foreground_image_url", null)
+                      }
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-xs text-zinc-400">Target URL / Anchor</label>
-                <input
-                  type="text"
-                  value={hero.primary_button_url || ""}
-                  onChange={(e) =>
-                    setHero({ ...hero, primary_button_url: e.target.value })
-                  }
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#1A1A1A] border border-white/10 focus:border-[#FF5500] text-white text-sm outline-none"
-                />
+
+              {/* Destination Settings */}
+              <div className="rounded-3xl bg-[#0A0A0A] border border-zinc-800/90 p-6 space-y-6 shadow-2xl">
+                <h3 className="text-xs font-black uppercase tracking-widest text-white border-l-2 border-[#FF5A00] pl-3">
+                  Slide {activeTab + 1} Actions &amp; Destination Link
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {/* Title / Alt Tag */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
+                      Slide Name / Alt Text
+                    </label>
+                    <input
+                      type="text"
+                      value={currentSlide.heading_line_1 || ""}
+                      onChange={(e) =>
+                        updateSlideField(activeTab, "heading_line_1", e.target.value)
+                      }
+                      placeholder={`Hero Slide ${activeTab + 1}`}
+                      className="w-full px-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white text-xs outline-none focus:border-[#FF5A00]"
+                    />
+                  </div>
+
+                  {/* Target URL */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
+                      Destination Link (Target URL)
+                    </label>
+                    <input
+                      type="text"
+                      value={currentSlide.primary_button_url || ""}
+                      onChange={(e) =>
+                        updateSlideField(activeTab, "primary_button_url", e.target.value)
+                      }
+                      placeholder="e.g. #shop-by-category, #featured-products, or URL"
+                      className="w-full px-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white text-xs outline-none focus:border-[#FF5A00]"
+                    />
+                  </div>
+
+                  {/* Status Toggle */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-black uppercase tracking-wider text-zinc-400 block">
+                      Slide Status
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateSlideField(
+                          activeTab,
+                          "is_active",
+                          !(currentSlide.is_active ?? true)
+                        )
+                      }
+                      className={`w-full py-2.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider border transition-all ${
+                        currentSlide.is_active ?? true
+                          ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
+                          : "bg-zinc-900 text-zinc-400 border-zinc-800"
+                      }`}
+                    >
+                      {currentSlide.is_active ?? true
+                        ? "Active in Auto-Slider"
+                        : "Disabled"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Natural Live Preview */}
+              {currentSlide.background_image_url && (
+                <div className="rounded-3xl bg-[#0A0A0A] border border-zinc-800/90 p-6 space-y-4 shadow-2xl">
+                  <div className="flex items-center gap-2 text-white">
+                    <Eye className="w-4 h-4 text-[#FF5A00]" />
+                    <h3 className="text-xs font-black uppercase tracking-widest">
+                      Live Natural Aspect Ratio Preview (Slide {activeTab + 1})
+                    </h3>
+                  </div>
+
+                  <div className="w-full rounded-2xl overflow-hidden border border-zinc-800 bg-black">
+                    <img
+                      src={currentSlide.background_image_url}
+                      alt={`Slide ${activeTab + 1} Preview`}
+                      className="w-full h-auto block"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Save Slide Action */}
+              <div className="sticky bottom-6 z-30 p-4 rounded-2xl bg-black/90 backdrop-blur-md border border-zinc-800 flex items-center justify-between shadow-2xl">
+                <div className="flex items-center gap-2 text-xs font-bold text-zinc-400">
+                  <Sparkles className="w-4 h-4 text-[#FF5A00]" />
+                  <span>Saves to 3-Slide Auto-Rotating Carousel</span>
+                </div>
+
+                <button
+                  type="button"
+                  disabled={savingSlide === activeTab}
+                  onClick={() => handleSaveSlide(activeTab)}
+                  className="px-8 py-3.5 rounded-xl font-black text-xs uppercase tracking-wider text-white bg-[#FF5A00] hover:bg-[#FF6A00] shadow-lg shadow-[#FF5A00]/30 transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
+                >
+                  {savingSlide === activeTab ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Publishing Slide {activeTab + 1}...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      <span>Save &amp; Publish Slide {activeTab + 1}</span>
+                    </>
+                  )}
+                </button>
               </div>
             </div>
-
-            <div className="p-4 rounded-2xl bg-[#141414] border border-white/5 space-y-4">
-              <span className="text-xs font-black text-zinc-300 uppercase tracking-wider block">
-                Secondary Button
-              </span>
-              <div className="space-y-1.5">
-                <label className="text-xs text-zinc-400">Button Label</label>
-                <input
-                  type="text"
-                  value={hero.secondary_button_text || ""}
-                  onChange={(e) =>
-                    setHero({ ...hero, secondary_button_text: e.target.value })
-                  }
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#1A1A1A] border border-white/10 focus:border-[#FF5500] text-white text-sm outline-none"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs text-zinc-400">Target URL / Anchor</label>
-                <input
-                  type="text"
-                  value={hero.secondary_button_url || ""}
-                  onChange={(e) =>
-                    setHero({ ...hero, secondary_button_url: e.target.value })
-                  }
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#1A1A1A] border border-white/10 focus:border-[#FF5500] text-white text-sm outline-none"
-                />
-              </div>
-            </div>
-          </div>
+          )}
         </div>
-
-        {/* Hero Artwork / Images */}
-        <div className="rounded-3xl bg-[#0E0E0E] border border-white/10 p-6 sm:p-8 space-y-6">
-          <h3 className="text-sm font-black uppercase tracking-wider text-white border-l-2 border-[#FF5500] pl-3">
-            Hero Artwork & RC Vehicle Media
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <ImageUploader
-              label="Foreground RC Vehicle Artwork"
-              bucket="site-assets"
-              folder="hero"
-              currentUrl={hero.foreground_image_url}
-              onUploadSuccess={(url) =>
-                setHero({ ...hero, foreground_image_url: url })
-              }
-              onRemove={() => setHero({ ...hero, foreground_image_url: null })}
-            />
-
-            <ImageUploader
-              label="Background Atmosphere / Texture"
-              bucket="site-assets"
-              folder="hero"
-              currentUrl={hero.background_image_url}
-              onUploadSuccess={(url) =>
-                setHero({ ...hero, background_image_url: url })
-              }
-              onRemove={() => setHero({ ...hero, background_image_url: null })}
-            />
-          </div>
-        </div>
-
-        {/* Save Bar */}
-        <div className="sticky bottom-6 z-20 p-4 rounded-2xl bg-[#141414]/90 backdrop-blur-md border border-white/10 flex items-center justify-between shadow-2xl">
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={hero.is_active}
-              onChange={(e) => setHero({ ...hero, is_active: e.target.checked })}
-              className="w-4 h-4 text-[#FF5500] accent-[#FF5500] rounded"
-            />
-            <span className="text-xs font-bold uppercase tracking-wider text-zinc-300">
-              Hero Section Active on Website
-            </span>
-          </label>
-
-          <button
-            type="submit"
-            disabled={isSaving}
-            className="px-6 py-3 rounded-xl font-black text-xs sm:text-sm tracking-wider uppercase text-white bg-[#FF5500] hover:bg-[#FF6A1A] shadow-lg shadow-[#FF5500]/30 transition-all flex items-center gap-2 disabled:opacity-50"
-          >
-            {isSaving ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Saving...</span>
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4" />
-                <span>Save Hero Section</span>
-              </>
-            )}
-          </button>
-        </div>
-      </form>
+      )}
     </div>
   );
 }

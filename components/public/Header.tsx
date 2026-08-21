@@ -98,13 +98,13 @@ export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
             onClick={() => setMobileMenuOpen(false)}
             className="flex items-center gap-2 group shrink-0"
           >
-            <div className="relative h-9 w-36 sm:h-10 sm:w-44 lg:h-11 lg:w-48 flex items-center transition-transform duration-300 group-hover:scale-105">
+            <div className="relative h-10 w-44 sm:h-11 sm:w-48 flex items-center transition-transform duration-300 group-hover:scale-105">
               <Image
                 src={settings.logo_url || "/logo/Screenshot 2026-08-18 121555.png"}
                 alt={settings.business_name || "RC Gadgets"}
                 fill
-                sizes="(max-width: 640px) 150px, (max-width: 1024px) 180px, 220px"
-                className="object-contain object-left scale-125 sm:scale-130 origin-left"
+                sizes="(max-width: 640px) 160px, 220px"
+                className="object-contain object-left"
                 priority
               />
             </div>

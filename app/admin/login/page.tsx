@@ -4,8 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
-import { Lock, Mail, ArrowRight, AlertCircle, Loader2, Sparkles } from "lucide-react";
+import { Lock, Mail, ArrowRight, AlertCircle, Loader2 } from "lucide-react";
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
@@ -43,27 +42,28 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] flex items-center justify-center p-4 relative overflow-hidden rc-carbon-grid">
-      {/* Background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 sm:w-[500px] h-96 sm:h-[500px] bg-[#FF5500]/15 blur-[140px] pointer-events-none rounded-full" />
+    <div className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Subtle background ambient glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 sm:w-[500px] h-96 sm:h-[500px] bg-[#FF5A00]/10 blur-[150px] pointer-events-none rounded-full" />
 
-      <div className="w-full max-w-md bg-[#0D0D0D] border border-white/10 rounded-3xl p-8 sm:p-10 shadow-2xl relative z-10 space-y-6">
-        
+      <div className="w-full max-w-md bg-[#0A0A0A] border border-zinc-800/90 rounded-3xl p-8 sm:p-10 shadow-2xl relative z-10 space-y-6">
         {/* Brand Header */}
-        <div className="text-center space-y-3">
-          <Link href="/" className="inline-block">
-            <div className="flex items-center justify-center gap-2">
-              <span className="text-3xl font-black italic tracking-wider text-[#FF5500]">
-                RC
-              </span>
-              <span className="text-3xl font-extrabold tracking-widest text-white">
-                GADGETS
-              </span>
+        <div className="text-center space-y-3 flex flex-col items-center">
+          <Link href="/" className="inline-block group">
+            <div className="relative h-10 w-44 sm:h-12 sm:w-52">
+              <Image
+                src="/logo/Screenshot 2026-08-18 121555.png"
+                alt="RC GADGETS"
+                fill
+                sizes="220px"
+                className="object-contain"
+                priority
+              />
             </div>
           </Link>
 
           <div>
-            <h1 className="text-xl font-black uppercase text-white tracking-wide">
+            <h1 className="text-lg font-black uppercase text-white tracking-wider">
               Admin Portal Login
             </h1>
             <p className="text-xs text-zinc-400 mt-1">
@@ -84,7 +84,7 @@ export default function AdminLoginPage() {
         <form onSubmit={handleAuth} className="space-y-4">
           <div className="space-y-1.5">
             <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
-              Admin Username / Email
+              Admin Email / Username
             </label>
             <div className="relative">
               <input
@@ -93,7 +93,7 @@ export default function AdminLoginPage() {
                 placeholder="admin@rcgadgets"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#141414] border border-white/10 focus:border-[#FF5500] focus:ring-1 focus:ring-[#FF5500] text-white text-sm outline-none transition-all"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#141414] border border-zinc-800 focus:border-[#FF5A00] focus:ring-1 focus:ring-[#FF5A00] text-white text-sm outline-none transition-all"
               />
               <Mail className="w-4 h-4 text-zinc-500 absolute left-3.5 top-3.5" />
             </div>
@@ -110,7 +110,7 @@ export default function AdminLoginPage() {
                 placeholder="••••••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#141414] border border-white/10 focus:border-[#FF5500] focus:ring-1 focus:ring-[#FF5500] text-white text-sm outline-none transition-all"
+                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#141414] border border-zinc-800 focus:border-[#FF5A00] focus:ring-1 focus:ring-[#FF5A00] text-white text-sm outline-none transition-all"
               />
               <Lock className="w-4 h-4 text-zinc-500 absolute left-3.5 top-3.5" />
             </div>
@@ -119,7 +119,7 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3.5 rounded-xl font-black text-xs sm:text-sm tracking-wider uppercase text-white bg-gradient-to-r from-[#FF5500] to-[#E04400] hover:from-[#FF6A1A] hover:to-[#FF5500] shadow-lg shadow-[#FF5500]/30 hover:shadow-[#FF5500]/50 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full py-3.5 rounded-xl font-black text-xs sm:text-sm tracking-wider uppercase text-white bg-[#FF5A00] hover:bg-[#FF6A00] shadow-lg shadow-[#FF5A00]/25 hover:shadow-[#FF5A00]/40 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {isLoading ? (
               <>
@@ -144,7 +144,6 @@ export default function AdminLoginPage() {
             ← Back to Public Website
           </Link>
         </div>
-
       </div>
     </div>
   );

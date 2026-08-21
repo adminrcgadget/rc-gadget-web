@@ -54,7 +54,16 @@ export default function AdminCategoriesPage() {
       if (data && data.length > 0) {
         setCategories(data as Category[]);
       } else {
-        setCategories([]);
+        setCategories([
+          { id: "c-1", name: "RC Cars", short_description: "High-speed brushless buggies, crawlers & drift racers", icon_url: null, image_url: "/assets/cat-car.webp", sort_order: 1, is_active: true, created_at: "", updated_at: "" },
+          { id: "c-2", name: "RC Planes", short_description: "Aerobatic aircraft & precision scale jets", icon_url: null, image_url: "/assets/cat-plane.webp", sort_order: 2, is_active: true, created_at: "", updated_at: "" },
+          { id: "c-3", name: "RC Boats", short_description: "High velocity racing speedboats & catamarans", icon_url: null, image_url: "/assets/cat-ship.webp", sort_order: 3, is_active: true, created_at: "", updated_at: "" },
+          { id: "c-4", name: "RC Drones", short_description: "FPV racing quadcopters & 4K camera drones", icon_url: null, image_url: null, sort_order: 4, is_active: true, created_at: "", updated_at: "" },
+          { id: "c-5", name: "RC Bikes", short_description: "Scale gyro-stabilized racing motorcycles", icon_url: null, image_url: null, sort_order: 5, is_active: true, created_at: "", updated_at: "" },
+          { id: "c-6", name: "RC Parts", short_description: "Motors, ESCs, gears, suspension & alloy hop-ups", icon_url: null, image_url: "/assets/cat-excavator.webp", sort_order: 6, is_active: true, created_at: "", updated_at: "" },
+          { id: "c-7", name: "Batteries", short_description: "High C-rate LiPo packs, chargers & power leads", icon_url: null, image_url: null, sort_order: 7, is_active: true, created_at: "", updated_at: "" },
+          { id: "c-8", name: "Accessories", short_description: "Pro 2.4GHz transmitters, telemetry & pit tools", icon_url: null, image_url: null, sort_order: 8, is_active: true, created_at: "", updated_at: "" },
+        ]);
       }
     } catch (err) {
       console.error("Error fetching categories:", err);

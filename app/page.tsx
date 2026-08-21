@@ -1,79 +1,67 @@
 import React from "react";
+import { StoreProvider } from "@/components/context/StoreContext";
 import { Header } from "@/components/public/Header";
-import { Hero } from "@/components/public/Hero";
-import { WorldSection } from "@/components/public/WorldSection";
-import { ComingSoonBanner } from "@/components/public/ComingSoonBanner";
-import { AboutSection } from "@/components/public/AboutSection";
-import { ExperienceSection } from "@/components/public/ExperienceSection";
-import { ContactSection } from "@/components/public/ContactSection";
-import { Footer } from "@/components/public/Footer";
+import { StoreHero } from "@/components/public/StoreHero";
+import { TrustBar } from "@/components/public/TrustBar";
+import { ShopByCategory } from "@/components/public/ShopByCategory";
+import { FeaturedProducts } from "@/components/public/FeaturedProducts";
+import { PromoTriCards } from "@/components/public/PromoTriCards";
+import { SecondaryTrustBar } from "@/components/public/SecondaryTrustBar";
+import { StoreFooter } from "@/components/public/StoreFooter";
+import { CartDrawer } from "@/components/public/CartDrawer";
 
 import {
   getSiteSettings,
   getNavigationItems,
-  getHero,
+  getHeroSlides,
   getCategories,
   getActiveBanners,
-  getAboutSection,
-  getFeatures,
-  getExperiences,
   getSocialLinks,
 } from "@/lib/queries";
 
 export const revalidate = 0;
 
 export default async function HomePage() {
-  const [
-    settings,
-    navigation,
-    hero,
-    categories,
-    banners,
-    about,
-    features,
-    experiences,
-    socialLinks,
-  ] = await Promise.all([
-    getSiteSettings(),
-    getNavigationItems(),
-    getHero(),
-    getCategories(),
-    getActiveBanners(),
-    getAboutSection(),
-    getFeatures(),
-    getExperiences(),
-    getSocialLinks(),
-  ]);
+  const [settings, navigation, heroSlides, categories, banners, socialLinks] =
+    await Promise.all([
+      getSiteSettings(),
+      getNavigationItems(),
+      getHeroSlides(),
+      getCategories(),
+      getActiveBanners(),
+      getSocialLinks(),
+    ]);
 
   return (
-    <main className="min-h-screen bg-[#FAFAFA] text-[#111111] selection:bg-[#FF5A00] selection:text-white relative">
-      {/* 1. Header Navigation */}
-      <Header settings={settings} navigation={navigation} />
+    <StoreProvider>
+      <main className="min-h-screen bg-[#F8F9FA] text-[#111111] selection:bg-[#FF5A00] selection:text-white relative pt-16 sm:pt-20">
+        {/* 1. Header Navigation */}
+        <Header settings={settings} navigation={navigation} />
 
-      {/* 2. Hero Section */}
-      <Hero hero={hero} settings={settings} />
+        {/* 2. Auto-Sliding 3-Banner Hero Showcase */}
+        <StoreHero heroSlides={heroSlides} />
 
-      {/* 3. Categories 5-Icon Horizontal Strip Module */}
-      <WorldSection categories={categories} />
+        {/* 3. Value Proposition Trust Bar */}
+        <TrustBar />
 
-      {/* 4. Coming Soon Banner */}
-      <ComingSoonBanner banners={banners} />
+        {/* 4. Shop By Category (8 Categories) */}
+        <ShopByCategory categories={categories} />
 
-      {/* 5. About Section + 4 Features Grid */}
-      <AboutSection about={about} features={features} />
+        {/* 5. Featured Products with Tabs */}
+        <FeaturedProducts />
 
-      {/* 6. Experience The Thrill Track Cards */}
-      <ExperienceSection experiences={experiences} />
+        {/* 6. 3 Promo Banners Under Products */}
+        <PromoTriCards banners={banners} />
 
-      {/* 7. Contact Info Dark Panel */}
-      <ContactSection settings={settings} />
+        {/* 7. Secondary Guarantee & Trust Bar */}
+        <SecondaryTrustBar />
 
-      {/* 8. Social Bar & Footer */}
-      <Footer
-        settings={settings}
-        navigation={navigation}
-        socialLinks={socialLinks}
-      />
-    </main>
+        {/* 8. 5-Column Dark Store Footer */}
+        <StoreFooter settings={settings} socialLinks={socialLinks} />
+
+        {/* 9. Interactive Slide-over Cart Drawer */}
+        <CartDrawer />
+      </main>
+    </StoreProvider>
   );
 }
