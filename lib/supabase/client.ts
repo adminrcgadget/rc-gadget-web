@@ -2,17 +2,14 @@ import { createBrowserClient } from "@supabase/ssr";
 import { Database } from "@/types/database";
 
 export const createClient = () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder-project.supabase.co";
   const supabaseKey =
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseKey) {
-    console.warn("Supabase environment variables are missing.");
-  }
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+    "placeholder-anon-key";
 
   return createBrowserClient<Database>(
-    supabaseUrl || "",
-    supabaseKey || ""
+    supabaseUrl,
+    supabaseKey
   );
 };
