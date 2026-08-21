@@ -17,12 +17,13 @@ import {
   getCategories,
   getActiveBanners,
   getSocialLinks,
+  getProducts,
 } from "@/lib/queries";
 
 export const revalidate = 0;
 
 export default async function HomePage() {
-  const [settings, navigation, heroSlides, categories, banners, socialLinks] =
+  const [settings, navigation, heroSlides, categories, banners, socialLinks, products] =
     await Promise.all([
       getSiteSettings(),
       getNavigationItems(),
@@ -30,6 +31,7 @@ export default async function HomePage() {
       getCategories(),
       getActiveBanners(),
       getSocialLinks(),
+      getProducts(),
     ]);
 
   return (
@@ -48,7 +50,7 @@ export default async function HomePage() {
         <ShopByCategory categories={categories} />
 
         {/* 5. Featured Products with Tabs */}
-        <FeaturedProducts />
+        <FeaturedProducts products={products} />
 
         {/* 6. 3 Promo Banners Under Products */}
         <PromoTriCards banners={banners} />
@@ -65,3 +67,4 @@ export default async function HomePage() {
     </StoreProvider>
   );
 }
+

@@ -268,15 +268,55 @@ export default function AdminBannersPage() {
                   {/* Title */}
                   <div className="space-y-1.5 pt-2 border-t border-white/5">
                     <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
-                      Banner Title / Tag
+                      Headline / Title
                     </label>
                     <input
                       type="text"
                       value={banner.title || ""}
-                      onChange={(e) =>
-                        updateBannerState(idx, { title: e.target.value })
-                      }
-                      placeholder="e.g. NEW ARRIVALS / UP TO 20% OFF"
+                      onChange={(e) => updateBannerState(idx, { title: e.target.value })}
+                      placeholder="e.g. NEW ARRIVALS"
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#161616] border border-white/10 text-white text-xs outline-none focus:border-[#FF5500]"
+                    />
+                  </div>
+
+                  {/* Subtitle */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
+                      Subtitle / Tagline
+                    </label>
+                    <input
+                      type="text"
+                      value={banner.subtitle || ""}
+                      onChange={(e) => updateBannerState(idx, { subtitle: e.target.value })}
+                      placeholder="e.g. Latest RC models just landed"
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#161616] border border-white/10 text-white text-xs outline-none focus:border-[#FF5500]"
+                    />
+                  </div>
+
+                  {/* Description */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
+                      Description (optional)
+                    </label>
+                    <textarea
+                      value={banner.description || ""}
+                      onChange={(e) => updateBannerState(idx, { description: e.target.value })}
+                      placeholder="Short promo description..."
+                      rows={2}
+                      className="w-full px-4 py-2.5 rounded-xl bg-[#161616] border border-white/10 text-white text-xs outline-none focus:border-[#FF5500] resize-none"
+                    />
+                  </div>
+
+                  {/* Button Text */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
+                      Button Label
+                    </label>
+                    <input
+                      type="text"
+                      value={banner.button_text || ""}
+                      onChange={(e) => updateBannerState(idx, { button_text: e.target.value })}
+                      placeholder="e.g. EXPLORE NOW"
                       className="w-full px-4 py-2.5 rounded-xl bg-[#161616] border border-white/10 text-white text-xs outline-none focus:border-[#FF5500]"
                     />
                   </div>
@@ -289,12 +329,49 @@ export default function AdminBannersPage() {
                     <input
                       type="text"
                       value={banner.button_url || ""}
-                      onChange={(e) =>
-                        updateBannerState(idx, { button_url: e.target.value })
-                      }
+                      onChange={(e) => updateBannerState(idx, { button_url: e.target.value })}
                       placeholder="e.g. #featured-products or #experience"
                       className="w-full px-4 py-2.5 rounded-xl bg-[#161616] border border-white/10 text-white text-xs outline-none focus:border-[#FF5500]"
                     />
+                  </div>
+
+                  {/* Live Preview */}
+                  <div className="space-y-2 pt-2 border-t border-white/5">
+                    <label className="text-xs font-black uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
+                      <Sparkles className="w-3 h-3 text-[#FF5500]" />
+                      Live Preview
+                    </label>
+                    <div
+                      className="relative w-full aspect-[16/7] rounded-xl overflow-hidden border border-white/10 bg-zinc-900 flex items-end"
+                      style={banner.image_url ? { backgroundImage: `url(${banner.image_url})`, backgroundSize: "cover", backgroundPosition: "center" } : {}}
+                    >
+                      {/* Dark gradient overlay for readability */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+
+                      {!banner.image_url && (
+                        <div className="absolute inset-0 flex items-center justify-center text-zinc-600">
+                          <ImageIcon className="w-8 h-8" />
+                        </div>
+                      )}
+
+                      {/* Text overlay — fixed at bottom left */}
+                      <div className="relative z-10 p-4 space-y-1">
+                        {banner.title && (
+                          <p className="text-[10px] font-black uppercase tracking-widest text-[#FF5500]">{banner.title}</p>
+                        )}
+                        {banner.subtitle && (
+                          <p className="text-sm font-black text-white leading-tight">{banner.subtitle}</p>
+                        )}
+                        {banner.description && (
+                          <p className="text-[10px] text-white/70 leading-snug max-w-[200px]">{banner.description}</p>
+                        )}
+                        {banner.button_text && (
+                          <div className="mt-2 inline-flex items-center px-3 py-1 rounded-full bg-[#FF5500] text-white text-[9px] font-black uppercase tracking-wider">
+                            {banner.button_text}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
 

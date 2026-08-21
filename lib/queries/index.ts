@@ -7,3 +7,4 @@ export * from "./about";
 export * from "./features";
 export * from "./experiences";
 export * from "./social";
+export * from "./products";
