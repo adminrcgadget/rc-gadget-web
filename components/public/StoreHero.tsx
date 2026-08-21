@@ -70,7 +70,7 @@ export const StoreHero: React.FC<StoreHeroProps> = ({ hero, heroSlides }) => {
         <div
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
-          className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden border border-gray-200/90 bg-white shadow-sm hover:shadow-md transition-all"
+          className="relative w-full rounded-2xl sm:rounded-3xl overflow-hidden border border-gray-200/90 bg-white shadow-sm hover:shadow-md transition-all max-h-[500px] sm:max-h-[560px] md:max-h-[630px] lg:max-h-[660px]"
         >
           {totalSlides > 0 ? (
             <div className="relative w-full overflow-hidden bg-white">
@@ -93,12 +93,12 @@ export const StoreHero: React.FC<StoreHeroProps> = ({ hero, heroSlides }) => {
                       href={slide.targetUrl}
                       className="relative block w-full bg-white"
                     >
-                      {/* Desktop Banner: Full Natural 100% Width & Auto Height */}
+                      {/* Desktop Banner */}
                       {slide.desktopUrl && (
                         <img
                           src={slide.desktopUrl}
                           alt={slide.title}
-                          className={`w-full h-auto block ${
+                          className={`w-full h-72 sm:h-[340px] md:h-[480px] lg:h-[600px] xl:h-[630px] object-cover object-center block ${
                             slide.mobileUrl !== slide.desktopUrl
                               ? "hidden sm:block"
                               : "block"
@@ -107,12 +107,12 @@ export const StoreHero: React.FC<StoreHeroProps> = ({ hero, heroSlides }) => {
                         />
                       )}
 
-                      {/* Mobile Banner: Dedicated mobile creative if uploaded */}
+                      {/* Mobile Banner */}
                       {slide.mobileUrl && slide.mobileUrl !== slide.desktopUrl && (
                         <img
                           src={slide.mobileUrl}
                           alt={slide.title}
-                          className="w-full h-auto block sm:hidden"
+                          className="w-full h-64 sm:h-80 object-cover object-center block sm:hidden"
                           loading={idx === 0 ? "eager" : "lazy"}
                         />
                       )}
@@ -120,15 +120,17 @@ export const StoreHero: React.FC<StoreHeroProps> = ({ hero, heroSlides }) => {
                   </div>
                 );
               })}
-
-
             </div>
           ) : (
-            /* Clean Empty Banner Slot (Ready for Admin Upload) */
+            /* Clean Empty Banner Slot */
             <Link
               href="/admin/hero"
               className="relative block w-full py-16 sm:py-24 bg-gray-50/90 hover:bg-orange-50/30 transition-colors"
             >
+
+
+
+
               <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center space-y-3">
                 <div className="w-14 h-14 rounded-2xl bg-white border border-gray-200 text-gray-400 group-hover:text-[#FF5A00] group-hover:border-[#FF5A00]/40 flex items-center justify-center transition-all shadow-xs">
                   <ImageIcon className="w-7 h-7" />

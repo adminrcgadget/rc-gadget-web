@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { createClient } from "@/lib/supabase/client";
 import {
+  Package,
   Layers,
   Image as ImageIcon,
   Sparkles,
@@ -20,6 +21,7 @@ import {
 
 export default function AdminOverviewPage() {
   const [stats, setStats] = useState({
+    productsCount: 6,
     categoriesCount: 8,
     bannersCount: 3,
     experiencesCount: 2,
@@ -33,7 +35,8 @@ export default function AdminOverviewPage() {
   const loadMetrics = async () => {
     setIsLoading(true);
     try {
-      const [cats, bans, exps, feats, socs, navs] = await Promise.all([
+      const [prods, cats, bans, exps, feats, socs, navs] = await Promise.all([
+        supabase.from("products").select("id", { count: "exact" }),
         supabase.from("categories").select("id", { count: "exact" }),
         supabase.from("banners").select("id", { count: "exact" }),
         supabase.from("experiences").select("id", { count: "exact" }),
@@ -43,6 +46,7 @@ export default function AdminOverviewPage() {
       ]);
 
       setStats({
+        productsCount: prods.count ?? 6,
         categoriesCount: cats.count ?? 8,
         bannersCount: bans.count ?? 3,
         experiencesCount: exps.count ?? 2,
@@ -63,11 +67,19 @@ export default function AdminOverviewPage() {
 
   const metricCards = [
     {
+      title: "Store Products",
+      count: stats.productsCount,
+      href: "/admin/products",
+      icon: Package,
+      color: "from-[#FF5A00]/25 to-transparent",
+      border: "border-zinc-800",
+    },
+    {
       title: "3 Promo Banners",
       count: stats.bannersCount,
       href: "/admin/banners",
       icon: ImageIcon,
-      color: "from-[#FF5A00]/20 to-transparent",
+      color: "from-[#FF5A00]/15 to-transparent",
       border: "border-zinc-800",
     },
     {
@@ -102,15 +114,8 @@ export default function AdminOverviewPage() {
       color: "from-pink-500/10 to-transparent",
       border: "border-zinc-800",
     },
-    {
-      title: "Navigation Items",
-      count: stats.navCount,
-      href: "/admin/navigation",
-      icon: MenuIcon,
-      color: "from-zinc-500/10 to-transparent",
-      border: "border-zinc-800",
-    },
   ];
+
 
   return (
     <div className="space-y-8 bg-black">
@@ -198,6 +203,17 @@ export default function AdminOverviewPage() {
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link
+            href="/admin/products"
+            className="p-4 rounded-2xl bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-800/80 hover:border-[#FF5A00]/50 transition-all flex items-center gap-3"
+          >
+            <Package className="w-5 h-5 text-[#FF5A00]" />
+            <div>
+              <div className="text-xs font-bold text-white uppercase">Products Catalog</div>
+              <div className="text-[11px] text-zinc-400">Add &amp; Edit Products</div>
+            </div>
+          </Link>
+
+          <Link
             href="/admin/banners"
             className="p-4 rounded-2xl bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-800/80 hover:border-[#FF5A00]/50 transition-all flex items-center gap-3"
           >
@@ -214,7 +230,7 @@ export default function AdminOverviewPage() {
           >
             <Layers className="w-5 h-5 text-[#FF5A00]" />
             <div>
-              <div className="text-xs font-bold text-white uppercase">8 Categories</div>
+              <div className="text-xs font-bold text-white uppercase">Categories</div>
               <div className="text-[11px] text-zinc-400">Photos &amp; Titles</div>
             </div>
           </Link>
@@ -229,18 +245,8 @@ export default function AdminOverviewPage() {
               <div className="text-[11px] text-zinc-400">Headlines &amp; Photos</div>
             </div>
           </Link>
-
-          <Link
-            href="/admin/experiences"
-            className="p-4 rounded-2xl bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-800/80 hover:border-[#FF5A00]/50 transition-all flex items-center gap-3"
-          >
-            <Flag className="w-5 h-5 text-[#FF5A00]" />
-            <div>
-              <div className="text-xs font-bold text-white uppercase">Tracks &amp; Arena</div>
-              <div className="text-[11px] text-zinc-400">Speed &amp; Adventure</div>
-            </div>
-          </Link>
         </div>
+
       </div>
     </div>
   );

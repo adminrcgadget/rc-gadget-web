@@ -6,6 +6,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
+  Package,
   Settings,
   Sparkles,
   Image as ImageIcon,
@@ -23,6 +24,7 @@ import { useRouter } from "next/navigation";
 
 const navItems = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { label: "Products Catalog", href: "/admin/products", icon: Package },
   { label: "3 Promo Banners", href: "/admin/banners", icon: ImageIcon },
   { label: "Our Categories", href: "/admin/categories", icon: Layers },
   { label: "Hero Banner", href: "/admin/hero", icon: Sparkles },
@@ -33,6 +35,7 @@ const navItems = [
   { label: "Social Links", href: "/admin/social", icon: Share2 },
   { label: "Navigation Menu", href: "/admin/navigation", icon: MenuIcon },
 ];
+
 
 export const AdminSidebar: React.FC<{ isOpen?: boolean; onClose?: () => void }> = ({
   isOpen = false,

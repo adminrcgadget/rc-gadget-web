@@ -9,6 +9,10 @@ cloudinary.config({
   secure: true,
 });
 
+// Extend route timeout to 60s for large image uploads (Vercel & local)
+export const maxDuration = 60;
+
+
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();

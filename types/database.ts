@@ -136,6 +136,28 @@ export interface SocialLink {
   updated_at: string;
 }
 
+export interface Product {
+  id: string;
+  title: string;
+  category_name: string;
+  brand_name: string | null;
+  price: number;
+  original_price?: number | null;
+  rating: number;
+  reviews_count: number;
+  badge?: string | null;
+  image_url?: string | null;
+  description?: string | null;
+  stock_quantity?: number;
+  is_bestseller?: boolean;
+  is_new_arrival?: boolean;
+  is_top_rated?: boolean;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -184,9 +206,15 @@ export interface Database {
         Insert: Record<string, any>;
         Update: Record<string, any>;
       };
+      products: {
+        Row: Product;
+        Insert: Record<string, any>;
+        Update: Record<string, any>;
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
     Enums: Record<string, never>;
   };
 }
+

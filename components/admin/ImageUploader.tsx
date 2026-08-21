@@ -42,7 +42,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
       return;
     }
 
-    // 2. Validation: File size (10MB max for Cloudinary)
+    // 2. Validation: File size (10MB max)
     if (file.size > 10 * 1024 * 1024) {
       setErrorMsg("File size exceeds 10MB limit. Please choose a smaller image.");
       return;
@@ -52,9 +52,13 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
     const localPreview = URL.createObjectURL(file);
     setPreviewUrl(localPreview);
 
-    // 3. Upload to Cloudinary via server route /api/upload
+    // 3. Upload via server route /api/upload (with 60s timeout)
     setIsUploading(true);
     if (onUploadingStateChange) onUploadingStateChange(true);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
+
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -63,7 +67,10 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
       const response = await fetch("/api/upload", {
         method: "POST",
         body: formData,
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       const result = await response.json();
 
@@ -75,8 +82,12 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
       setSuccessMsg("Uploaded to Cloudinary successfully!");
       onUploadSuccess(result.url);
     } catch (err: any) {
+      clearTimeout(timeoutId);
       console.error("Cloudinary upload error:", err);
-      setErrorMsg(err.message || "Failed to upload image to Cloudinary");
+      const msg = err.name === "AbortError"
+        ? "Upload timed out — please try a smaller image or check your connection."
+        : err.message || "Failed to upload image to Cloudinary";
+      setErrorMsg(msg);
     } finally {
       setIsUploading(false);
       if (onUploadingStateChange) onUploadingStateChange(false);
