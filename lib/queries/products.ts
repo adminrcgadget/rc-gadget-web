@@ -150,3 +150,61 @@ export async function getProducts(): Promise<Product[]> {
     return defaultProducts;
   }
 }
+
+export async function getProductById(id: string): Promise<Product | null> {
+  try {
+    const supabase = await createServerSupabaseClient();
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (!error && data) {
+      return data as Product;
+    }
+
+    // Fallback: search in defaultProducts by id or match by index
+    const fallback = defaultProducts.find((p) => p.id === id);
+    if (fallback) return fallback;
+
+    return null;
+  } catch (err) {
+    console.error(`Failed to fetch product with id ${id}:`, err);
+    return defaultProducts.find((p) => p.id === id) || null;
+  }
+}
+
+export async function getRelatedProducts(
+  currentId: string,
+  categoryName: string,
+  limit: number = 4
+): Promise<Product[]> {
+  try {
+    const supabase = await createServerSupabaseClient();
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("is_active", true)
+      .eq("category_name", categoryName)
+      .neq("id", currentId)
+      .limit(limit);
+
+    if (!error && data && data.length > 0) {
+      return data as Product[];
+    }
+
+    // Fallback: filter from defaultProducts
+    const filtered = defaultProducts
+      .filter((p) => p.id !== currentId && p.category_name === categoryName)
+      .slice(0, limit);
+
+    if (filtered.length > 0) return filtered;
+
+    return defaultProducts.filter((p) => p.id !== currentId).slice(0, limit);
+  } catch (err) {
+    console.error("Failed to fetch related products:", err);
+    return defaultProducts.filter((p) => p.id !== currentId).slice(0, limit);
+  }
+}
+

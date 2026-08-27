@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
-import { Montserrat, Orbitron } from "next/font/google";
+import { Inter, Montserrat, Orbitron } from "next/font/google";
 import { getSiteSettings } from "@/lib/queries/site";
 import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -51,11 +57,11 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${montserrat.variable} ${orbitron.variable} dark scroll-smooth`}
+      className={`${inter.variable} ${montserrat.variable} ${orbitron.variable} scroll-smooth`}
     >
       <body
         suppressHydrationWarning
-        className="min-h-screen bg-[#050505] text-[#F5F5F5] font-sans antialiased selection:bg-[#FF5A00] selection:text-black"
+        className="min-h-screen bg-[#FAFAFA] text-[#111111] font-sans antialiased selection:bg-[#FF5A00] selection:text-white"
       >
         {children}
       </body>

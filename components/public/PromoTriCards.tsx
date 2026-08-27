@@ -18,9 +18,9 @@ function getValidUrl(url?: string | null): string | null {
 
 export const PromoTriCards: React.FC<PromoTriCardsProps> = ({ banners }) => {
   const defaultSlots = [
-    { id: "promo-banner-1", title: "", subtitle: "", description: "", button_text: "", button_url: "#featured-products", image_url: null, desktop_image_url: null, mobile_image_url: null },
-    { id: "promo-banner-2", title: "", subtitle: "", description: "", button_text: "", button_url: "#featured-products", image_url: null, desktop_image_url: null, mobile_image_url: null },
-    { id: "promo-banner-3", title: "", subtitle: "", description: "", button_text: "", button_url: "#experience",         image_url: null, desktop_image_url: null, mobile_image_url: null },
+    { id: "promo-banner-1", title: "", subtitle: "", description: "", button_text: "", button_url: "/shop", image_url: null, desktop_image_url: null, mobile_image_url: null },
+    { id: "promo-banner-2", title: "", subtitle: "", description: "", button_text: "", button_url: "/shop", image_url: null, desktop_image_url: null, mobile_image_url: null },
+    { id: "promo-banner-3", title: "", subtitle: "", description: "", button_text: "", button_url: "/shop", image_url: null, desktop_image_url: null, mobile_image_url: null },
   ];
 
   const slots = defaultSlots.map((defaultSlot, idx) => {

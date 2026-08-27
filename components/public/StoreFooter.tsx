@@ -160,11 +160,13 @@ export const StoreFooter: React.FC<StoreFooterProps> = ({
               <ul className="space-y-2.5 text-xs text-zinc-400">
                 {[
                   { label: "Home", href: "/" },
-                  { label: "Shop", href: "#featured-products" },
-                  { label: "Categories", href: "#shop-by-category" },
-                  { label: "Brands", href: "#top-brands" },
-                  { label: "Tracks & Arena", href: "#experience" },
-                  { label: "Contact", href: "#contact" },
+                  { label: "All Shop Catalog", href: "/shop" },
+                  { label: "RC Cars", href: "/shop?category=RC%20Cars" },
+                  { label: "RC Planes", href: "/shop?category=RC%20Planes" },
+                  { label: "RC Ships", href: "/shop?category=RC%20Ships" },
+                  { label: "RC Drones & Gadgets", href: "/shop?category=RC%20Drones" },
+                  { label: "Tracks & Arena", href: "/#experience" },
+                  { label: "Contact Us", href: "/#contact" },
                 ].map((item) => (
                   <li key={item.label}>
                     <Link href={item.href} className="hover:text-white transition-colors">

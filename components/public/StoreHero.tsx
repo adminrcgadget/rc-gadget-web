@@ -33,7 +33,7 @@ export const StoreHero: React.FC<StoreHeroProps> = ({ hero, heroSlides }) => {
     .map((slide, idx) => {
       const desktop = getValidUrl(slide.background_image_url);
       const mobile = getValidUrl(slide.foreground_image_url) || desktop;
-      const target = getValidUrl(slide.primary_button_url) || "#shop-by-category";
+      const target = getValidUrl(slide.primary_button_url) || "/shop";
 
       return {
         id: slide.id || `slide-${idx + 1}`,

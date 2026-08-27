@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { StoreProduct, useStore } from "@/components/context/StoreContext";
 import {
   Heart,
@@ -225,10 +226,12 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                 </button>
               ))}
             </div>
-
-            <span className="text-xs font-black uppercase tracking-wider text-gray-400 hover:text-[#FF5A00] transition-colors cursor-pointer shrink-0 hidden sm:block">
-              View all
-            </span>
+            <Link
+              href="/shop"
+              className="text-xs font-black uppercase tracking-wider text-gray-500 hover:text-[#FF5A00] transition-colors cursor-pointer shrink-0 hidden sm:block"
+            >
+              VIEW ALL IN SHOP →
+            </Link>
           </div>
         </div>
 
@@ -260,7 +263,10 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                     <span />
                   )}
                   <button
-                    onClick={() => toggleWishlist(product)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleWishlist(product);
+                    }}
                     className={`p-1 rounded-full transition-colors ${
                       isWish ? "bg-rose-50 text-rose-500" : "text-gray-300 hover:text-rose-400"
                     }`}
@@ -269,33 +275,36 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                   </button>
                 </div>
 
-                {/* Image */}
-                <div className="relative w-full h-28 rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center mb-2.5">
-                  {hasImg ? (
-                    <Image
-                      src={product.image_url!}
-                      alt={product.title}
-                      fill
-                      sizes="160px"
-                      className="object-contain p-2 transition-transform duration-500 group-hover:scale-110"
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center text-gray-300">
-                      <ShoppingBag className="w-7 h-7 mb-1" />
-                      <span className="text-[8px] font-bold uppercase tracking-wider text-gray-300">No Image</span>
-                    </div>
-                  )}
-                </div>
+                {/* Clickable Image & Title */}
+                <Link href={`/products/${product.id}`} className="block">
+                  {/* Image */}
+                  <div className="relative w-full h-28 rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center mb-2.5">
+                    {hasImg ? (
+                      <Image
+                        src={product.image_url!}
+                        alt={product.title}
+                        fill
+                        sizes="160px"
+                        className="object-contain p-2 transition-transform duration-500 group-hover:scale-110"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-gray-300">
+                        <ShoppingBag className="w-7 h-7 mb-1" />
+                        <span className="text-[8px] font-bold uppercase tracking-wider text-gray-300">No Image</span>
+                      </div>
+                    )}
+                  </div>
 
-                {/* Brand & Title */}
-                <div className="space-y-0.5 mb-3">
-                  <span className="text-[9px] font-black uppercase tracking-wider text-[#FF5A00] block">
-                    {product.brand_name || "RC GADGETS"}
-                  </span>
-                  <h3 className="text-[11px] font-bold text-gray-900 line-clamp-2 leading-snug">
-                    {product.title}
-                  </h3>
-                </div>
+                  {/* Brand & Title */}
+                  <div className="space-y-0.5 mb-3">
+                    <span className="text-[9px] font-black uppercase tracking-wider text-[#FF5A00] block">
+                      {product.brand_name || "RC GADGETS"}
+                    </span>
+                    <h3 className="text-[11px] font-bold text-gray-900 line-clamp-2 leading-snug group-hover:text-[#FF5A00] transition-colors">
+                      {product.title}
+                    </h3>
+                  </div>
+                </Link>
 
                 {/* Price + Rating + Cart */}
                 <div className="border-t border-gray-100 pt-2.5 flex items-end justify-between gap-1">
@@ -360,8 +369,11 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                       <span />
                     )}
                     <button
-                      onClick={() => toggleWishlist(product)}
-                      className={`p-1.5 rounded-full transition-colors ${
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleWishlist(product);
+                      }}
+                      className={`p-1.5 rounded-full transition-colors cursor-pointer ${
                         isWish
                           ? "bg-rose-50 text-rose-500"
                           : "text-gray-400 hover:text-rose-500 hover:bg-gray-100"
@@ -372,35 +384,38 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                     </button>
                   </div>
 
-                  {/* Image */}
-                  <div className="relative w-full h-36 sm:h-40 rounded-2xl overflow-hidden bg-gray-50/70 flex items-center justify-center p-2 mb-3">
-                    {hasImg ? (
-                      <Image
-                        src={product.image_url!}
-                        alt={product.title}
-                        fill
-                        sizes="200px"
-                        className="object-contain p-2 transition-transform duration-500 group-hover:scale-110"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 p-2 text-center">
-                        <ShoppingBag className="w-8 h-8 text-gray-300 mb-1" />
-                        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">
-                          Upload Photo
-                        </span>
-                      </div>
-                    )}
-                  </div>
+                  {/* Clickable Image & Title */}
+                  <Link href={`/products/${product.id}`} className="block">
+                    {/* Image */}
+                    <div className="relative w-full h-36 sm:h-40 rounded-2xl overflow-hidden bg-gray-50/70 flex items-center justify-center p-2 mb-3">
+                      {hasImg ? (
+                        <Image
+                          src={product.image_url!}
+                          alt={product.title}
+                          fill
+                          sizes="200px"
+                          className="object-contain p-2 transition-transform duration-500 group-hover:scale-110"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 p-2 text-center">
+                          <ShoppingBag className="w-8 h-8 text-gray-300 mb-1" />
+                          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">
+                            RC Model
+                          </span>
+                        </div>
+                      )}
+                    </div>
 
-                  {/* Brand & Title */}
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-[#FF5A00] block">
-                      {product.brand_name || "RC GADGETS"}
-                    </span>
-                    <h3 className="text-xs font-bold text-gray-900 line-clamp-2 leading-snug group-hover:text-[#FF5A00] transition-colors">
-                      {product.title}
-                    </h3>
-                  </div>
+                    {/* Brand & Title */}
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-[#FF5A00] block">
+                        {product.brand_name || "RC GADGETS"}
+                      </span>
+                      <h3 className="text-xs font-bold text-gray-900 line-clamp-2 leading-snug group-hover:text-[#FF5A00] transition-colors">
+                        {product.title}
+                      </h3>
+                    </div>
+                  </Link>
                 </div>
 
                 {/* Bottom Bar */}
@@ -425,7 +440,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
 
                   <button
                     onClick={(e) => handleAddToCart(product, e)}
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 shrink-0 shadow-sm ${
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-300 shrink-0 shadow-sm cursor-pointer ${
                       isAdded
                         ? "bg-emerald-500 text-white"
                         : "bg-[#FF5A00] hover:bg-[#FF6A00] text-white active:scale-95 shadow-[#FF5A00]/25"

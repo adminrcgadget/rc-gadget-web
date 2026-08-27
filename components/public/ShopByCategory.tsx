@@ -54,20 +54,20 @@ export const ShopByCategory: React.FC<ShopByCategoryProps> = ({
             <p className="text-[11px] font-black uppercase tracking-widest text-[#FF5A00]">
               RC GADGETS CATEGORIES
             </p>
-            <h2 className="text-2xl sm:text-3xl font-black text-[#111111] tracking-tight">
-              Shop by Category
+            <h2 className="text-2xl sm:text-3xl font-black uppercase text-[#111111] tracking-tight">
+              SHOP BY CATEGORY
             </h2>
           </div>
 
           <Link
-            href="#featured-products"
-            className="text-xs font-semibold text-gray-500 hover:text-[#FF5A00] transition-colors flex items-center gap-1"
+            href="/shop"
+            className="text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-[#FF5A00] transition-colors flex items-center gap-1"
           >
-            View All →
+            VIEW ALL IN SHOP →
           </Link>
         </div>
 
-        {/* 6 × 2 Grid of Circular Category Cards */}
+        {/* Circular Category Cards */}
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-x-4 gap-y-7 sm:gap-x-6 sm:gap-y-9">
           {displayItems.map((cat: any, idx: number) => {
             const hasImg = Boolean(
@@ -79,7 +79,7 @@ export const ShopByCategory: React.FC<ShopByCategoryProps> = ({
             return (
               <Link
                 key={cat.id || `${cat.name}-${idx}`}
-                href="#featured-products"
+                href={`/shop?category=${encodeURIComponent(cat.name)}`}
                 onClick={() => handleCategoryClick(cat.name)}
                 className="group flex flex-col items-center gap-3"
               >

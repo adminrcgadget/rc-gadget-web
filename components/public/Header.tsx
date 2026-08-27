@@ -3,8 +3,10 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { SiteSettings, NavigationItem } from "@/types/database";
-import { Menu, X, ArrowRight, Phone } from "lucide-react";
+import { useStore } from "@/components/context/StoreContext";
+import { Menu, X, ArrowRight, Phone, ShoppingBag } from "lucide-react";
 
 interface HeaderProps {
   settings: SiteSettings;
@@ -15,9 +17,20 @@ export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeHref, setActiveHref] = useState("#hero");
+  const pathname = usePathname();
+  const isHomePage = pathname === "/";
+  const { cartCount, setIsCartOpen } = useStore();
 
-  // Exact sequence: HOME -> OUR WORLD -> COMING SOON -> ABOUT -> EXPERIENCE -> CONTACT
-  // Explicitly hides any 'About Us' / 'AboutUs' and 'Features' items
+  // Helper to format href correctly from any subpage
+  const formatHref = (href: string) => {
+    if (!href) return "/";
+    if (href.startsWith("#")) {
+      return isHomePage ? href : `/${href}`;
+    }
+    return href;
+  };
+
+  // Exact sequence: HOME -> SHOP -> OUR WORLD -> COMING SOON -> ABOUT -> EXPERIENCE -> CONTACT
   const uniqueNavigation = useMemo(() => {
     const seen = new Set<string>();
     const filtered = (navigation || []).filter((item) => {
@@ -38,15 +51,36 @@ export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
       const label = (item.label || "").toLowerCase();
 
       if (href.includes("hero") || label === "home") return 1;
-      if (href.includes("world") || label.includes("world")) return 2;
-      if (href.includes("coming") || label.includes("coming")) return 3;
-      if (href.includes("about") || label === "about") return 4;
-      if (href.includes("experience") || label.includes("experience")) return 5;
-      if (href.includes("contact") || label.includes("contact")) return 6;
+      if (href === "/shop" || href.includes("shop") || label === "shop") return 2;
+      if (href.includes("world") || label.includes("world")) return 3;
+      if (href.includes("coming") || label.includes("coming")) return 4;
+      if (href.includes("about") || label === "about") return 5;
+      if (href.includes("experience") || label.includes("experience")) return 6;
+      if (href.includes("contact") || label.includes("contact")) return 7;
       return item.sort_order ? item.sort_order + 10 : 99;
     };
 
-    return filtered.sort((a, b) => getOrderWeight(a) - getOrderWeight(b));
+    // Ensure Shop is in navigation if not already in DB
+    const hasShop = filtered.some(
+      (item) =>
+        (item.label || "").toLowerCase() === "shop" ||
+        (item.href || "").toLowerCase() === "/shop"
+    );
+
+    const result = [...filtered];
+    if (!hasShop) {
+      result.push({
+        id: "nav-shop",
+        label: "SHOP",
+        href: "/shop",
+        sort_order: 2,
+        is_visible: true,
+        created_at: "",
+        updated_at: "",
+      });
+    }
+
+    return result.sort((a, b) => getOrderWeight(a) - getOrderWeight(b));
   }, [navigation]);
 
   useEffect(() => {
@@ -92,7 +126,7 @@ export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
         <div className="flex items-center justify-between h-full">
           {/* Logo */}
           <Link
-            href="#hero"
+            href="/"
             onClick={() => setMobileMenuOpen(false)}
             className="flex items-center gap-2 group shrink-0"
           >
@@ -111,13 +145,28 @@ export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
           {/* Center Navigation Links (Desktop) */}
           <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
             {uniqueNavigation.map((item) => {
-              const isActive =
-                activeHref === item.href ||
-                (item.href === "#hero" && (activeHref === "" || activeHref === "#hero"));
+              const targetHref = formatHref(item.href);
+              const itemHref = (item.href || "").toLowerCase();
+              const itemLabel = (item.label || "").toLowerCase();
+
+              // Exact single-active determination
+              let isActive = false;
+              if (pathname === "/shop" || pathname.startsWith("/shop") || pathname.startsWith("/products")) {
+                isActive = itemHref === "/shop" || itemLabel === "shop";
+              } else if (isHomePage) {
+                if (itemHref === "/shop" || itemLabel === "shop") {
+                  isActive = false;
+                } else if (itemHref === "#hero" || itemHref === "/" || itemLabel === "home") {
+                  isActive = activeHref === "#hero" || activeHref === "" || activeHref === "/";
+                } else {
+                  isActive = activeHref === item.href;
+                }
+              }
+
               return (
                 <Link
                   key={item.id}
-                  href={item.href}
+                  href={targetHref}
                   className={`relative py-1 text-[11px] font-bold uppercase tracking-wider transition-colors duration-200 ${
                     isActive ? "text-white" : "text-[#A5A5A5] hover:text-white"
                   }`}
@@ -133,6 +182,7 @@ export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
 
           {/* Right Actions (Desktop) */}
           <div className="hidden lg:flex items-center gap-3.5">
+            {/* Phone Quick Call */}
             <a
               href={`tel:${(settings.phone || "7510110155").replace(/\s+/g, "")}`}
               className="p-2 text-zinc-400 hover:text-[#FF5A00] transition-colors rounded-lg hover:bg-zinc-900 flex items-center gap-1.5 text-xs font-semibold"
@@ -144,9 +194,25 @@ export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
               </span>
             </a>
 
+            {/* Cart Icon Button */}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative p-2 text-zinc-300 hover:text-white hover:bg-zinc-900 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
+              title="Shopping Cart"
+              aria-label="Shopping Cart"
+            >
+              <ShoppingBag className="w-4 h-4 text-[#FF5A00]" />
+              <span className="text-[11px] font-bold text-zinc-200">Cart</span>
+              {cartCount > 0 && (
+                <span className="w-4 h-4 rounded-full bg-[#FF5A00] text-white text-[9px] font-black flex items-center justify-center animate-in zoom-in">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+
             <Link
-              href="#contact"
-              className="group px-4 py-2 rounded-lg bg-[#FF5A00] hover:bg-[#FF6A00] text-white transition-all duration-300 text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-[#FF5A00]/25 hover:shadow-[#FF5A00]/40"
+              href={formatHref("#contact")}
+              className="group px-4 py-2 rounded-lg bg-[#FF5A00] hover:bg-[#FF6A00] text-white transition-all duration-300 text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-[#FF5A00]/25 hover:shadow-[#FF5A00]/40 cursor-pointer"
             >
               <span>GET IN TOUCH</span>
               <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-1" />
@@ -155,6 +221,20 @@ export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
 
           {/* Mobile Right Controls */}
           <div className="flex items-center gap-2 lg:hidden">
+            {/* Mobile Cart Trigger */}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-white hover:border-[#FF5A00] transition-colors cursor-pointer"
+              aria-label="Cart"
+            >
+              <ShoppingBag className="w-4 h-4 text-[#FF5A00]" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#FF5A00] text-white text-[9px] font-black flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )}
+            </button>
+
             <a
               href={`tel:${(settings.phone || "7510110155").replace(/\s+/g, "")}`}
               className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-[#FF5A00] hover:border-[#FF5A00]/50 transition-colors"
@@ -165,7 +245,7 @@ export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 bg-zinc-900 border border-zinc-800 text-white rounded-lg hover:border-[#FF5A00] transition-colors active:scale-95"
+              className="p-2 bg-zinc-900 border border-zinc-800 text-white rounded-lg hover:border-[#FF5A00] transition-colors active:scale-95 cursor-pointer"
               aria-label="Toggle Menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5 text-[#FF5A00]" /> : <Menu className="w-5 h-5" />}
@@ -179,11 +259,27 @@ export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
         <div className="lg:hidden absolute top-full left-0 right-0 bg-black/98 backdrop-blur-xl border-b border-zinc-800 shadow-2xl shadow-black/80 px-5 py-5 transition-all duration-300 animate-in fade-in slide-in-from-top-2">
           <div className="flex flex-col space-y-1">
             {uniqueNavigation.map((item) => {
-              const isActive = activeHref === item.href;
+              const targetHref = formatHref(item.href);
+              const itemHref = (item.href || "").toLowerCase();
+              const itemLabel = (item.label || "").toLowerCase();
+
+              let isActive = false;
+              if (pathname === "/shop" || pathname.startsWith("/shop") || pathname.startsWith("/products")) {
+                isActive = itemHref === "/shop" || itemLabel === "shop";
+              } else if (isHomePage) {
+                if (itemHref === "/shop" || itemLabel === "shop") {
+                  isActive = false;
+                } else if (itemHref === "#hero" || itemHref === "/" || itemLabel === "home") {
+                  isActive = activeHref === "#hero" || activeHref === "" || activeHref === "/";
+                } else {
+                  isActive = activeHref === item.href;
+                }
+              }
+
               return (
                 <Link
                   key={item.id}
-                  href={item.href}
+                  href={targetHref}
                   onClick={() => setMobileMenuOpen(false)}
                   className={`py-3 px-3 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center justify-between transition-colors ${
                     isActive
@@ -204,7 +300,7 @@ export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
 
             <div className="pt-3 border-t border-zinc-800/80 mt-2 space-y-2.5">
               <Link
-                href="#contact"
+                href={formatHref("#contact")}
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-full py-3 text-center text-xs font-black uppercase tracking-wider text-white bg-[#FF5A00] hover:bg-[#FF6A00] rounded-xl shadow-lg shadow-[#FF5A00]/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
               >

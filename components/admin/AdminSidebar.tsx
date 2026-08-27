@@ -91,13 +91,13 @@ export const AdminSidebar: React.FC<{ isOpen?: boolean; onClose?: () => void }> 
       )}
 
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-50 w-64 bg-[#0D0D10] border-r border-[#1C1C22] flex flex-col justify-between transition-transform duration-300 ${
+        className={`fixed top-0 bottom-0 left-0 z-50 w-64 bg-black border-r border-[#18181B] flex flex-col justify-between transition-transform duration-300 ${
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
-        <div className="flex flex-col h-full overflow-hidden">
+        <div className="flex flex-col h-full overflow-hidden bg-black">
           {/* Logo Brand Header matching Reference Design */}
-          <div className="p-6 border-b border-[#1C1C22] bg-[#0D0D10] shrink-0">
+          <div className="p-6 border-b border-[#18181B] bg-black shrink-0">
             <Link href="/admin" className="block group">
               <div className="relative h-8 w-40 mb-1">
                 <Image
@@ -116,7 +116,7 @@ export const AdminSidebar: React.FC<{ isOpen?: boolean; onClose?: () => void }> 
           </div>
 
           {/* Navigation Links with Active Pill Design */}
-          <nav className="flex-1 px-3 py-4 space-y-6 overflow-y-auto scrollbar-none">
+          <nav className="flex-1 px-3 py-4 space-y-6 overflow-y-auto scrollbar-none bg-black">
             {navGroups.map((group, gIdx) => (
               <div key={gIdx} className="space-y-1.5">
                 {group.groupLabel && (
@@ -136,8 +136,8 @@ export const AdminSidebar: React.FC<{ isOpen?: boolean; onClose?: () => void }> 
                       onClick={onClose}
                       className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold tracking-wide transition-all duration-200 group ${
                         isActive
-                          ? "bg-[#1C1C22] text-white shadow-sm font-bold border border-white/5"
-                          : "text-zinc-400 hover:text-white hover:bg-[#15151A]"
+                          ? "bg-[#18181C] text-white shadow-sm font-bold border border-[#27272A]"
+                          : "text-zinc-400 hover:text-white hover:bg-[#121215]"
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -170,11 +170,11 @@ export const AdminSidebar: React.FC<{ isOpen?: boolean; onClose?: () => void }> 
           </nav>
 
           {/* Bottom Action Footer */}
-          <div className="p-4 border-t border-[#1C1C22] space-y-2 bg-[#0A0A0D] shrink-0">
+          <div className="p-4 border-t border-[#18181B] space-y-2 bg-black shrink-0">
             <Link
               href="/"
               target="_blank"
-              className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold text-zinc-300 bg-[#141418] border border-white/5 hover:border-[#FF5A00]/40 hover:text-white transition-all group"
+              className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold text-zinc-300 bg-[#121215] border border-[#27272A] hover:border-[#FF5A00]/40 hover:text-white transition-all group"
             >
               <span className="flex items-center gap-2">
                 <ExternalLink className="w-3.5 h-3.5 text-[#FF5A00] group-hover:translate-x-0.5 transition-transform" />
