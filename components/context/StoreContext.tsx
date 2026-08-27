@@ -6,7 +6,7 @@ export interface StoreProduct {
   id: string;
   title: string;
   category_name: string;
-  brand_name: string;
+  brand_name?: string | null;
   price: number;
   original_price?: number | null;
   rating: number;

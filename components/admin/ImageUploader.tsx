@@ -17,7 +17,7 @@ interface ImageUploaderProps {
 export const ImageUploader: React.FC<ImageUploaderProps> = ({
   currentUrl,
   folder = "uploads",
-  label = "Upload Image (Cloudinary)",
+  label,
   onUploadSuccess,
   onUploadingStateChange,
   onRemove,
@@ -28,6 +28,11 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Sync state if currentUrl changes
+  React.useEffect(() => {
+    setPreviewUrl(currentUrl || null);
+  }, [currentUrl]);
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -36,7 +41,13 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
     setSuccessMsg(null);
 
     // 1. Validation: File type
-    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg", "image/svg+xml"];
+    const validTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/jpg",
+      "image/svg+xml",
+    ];
     if (!validTypes.includes(file.type)) {
       setErrorMsg("Please upload a valid image file (JPG, PNG, WebP, SVG).");
       return;
@@ -79,14 +90,15 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
       }
 
       setPreviewUrl(result.url);
-      setSuccessMsg("Uploaded to Cloudinary successfully!");
+      setSuccessMsg("Uploaded successfully!");
       onUploadSuccess(result.url);
     } catch (err: any) {
       clearTimeout(timeoutId);
-      console.error("Cloudinary upload error:", err);
-      const msg = err.name === "AbortError"
-        ? "Upload timed out — please try a smaller image or check your connection."
-        : err.message || "Failed to upload image to Cloudinary";
+      console.error("Upload error:", err);
+      const msg =
+        err.name === "AbortError"
+          ? "Upload timed out — please try a smaller image or check your connection."
+          : err.message || "Failed to upload image";
       setErrorMsg(msg);
     } finally {
       setIsUploading(false);
@@ -105,36 +117,36 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   return (
     <div className="space-y-2">
       {label && (
-        <label className="text-xs font-black uppercase tracking-wider text-zinc-300 block">
+        <label className="text-xs font-bold uppercase tracking-wider text-gray-700 block">
           {label}
         </label>
       )}
 
       {/* Preview and Upload Box */}
-      <div className="border-2 border-dashed border-white/15 hover:border-[#FF5500]/60 rounded-2xl p-4 bg-[#111111] transition-all">
+      <div className="border-2 border-dashed border-gray-200 hover:border-[#FF5A00]/60 rounded-2xl p-4 bg-gray-50/70 hover:bg-orange-50/20 transition-all">
         {previewUrl ? (
-          <div className="relative w-full h-44 sm:h-52 rounded-xl overflow-hidden bg-black/60 border border-white/10 group">
+          <div className="relative w-full h-44 sm:h-52 rounded-xl overflow-hidden bg-white border border-gray-200/80 group flex items-center justify-center p-2 shadow-xs">
             <Image
               src={previewUrl}
               alt="Preview"
               fill
               sizes="300px"
-              className="object-contain"
+              className="object-contain p-2"
             />
 
             {/* Overlay buttons */}
-            <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-xs">
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="px-3.5 py-1.5 rounded-lg bg-[#FF5500] text-white text-xs font-bold uppercase tracking-wider hover:bg-[#FF6A1A] transition-colors"
+                className="px-4 py-2 rounded-xl bg-[#FF5A00] text-white text-xs font-black uppercase tracking-wider hover:bg-[#FF6A00] transition-colors shadow-md shadow-[#FF5A00]/30"
               >
                 Change
               </button>
               <button
                 type="button"
                 onClick={handleClear}
-                className="p-1.5 rounded-lg bg-rose-600/80 text-white hover:bg-rose-600 transition-colors"
+                className="p-2 rounded-xl bg-rose-600 text-white hover:bg-rose-700 transition-colors shadow-md"
                 aria-label="Remove image"
               >
                 <X className="w-4 h-4" />
@@ -144,16 +156,16 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
         ) : (
           <div
             onClick={() => fileInputRef.current?.click()}
-            className="flex flex-col items-center justify-center py-8 px-4 text-center cursor-pointer group"
+            className="flex flex-col items-center justify-center py-7 px-4 text-center cursor-pointer group"
           >
-            <div className="w-12 h-12 rounded-xl bg-white/5 group-hover:bg-[#FF5500]/15 group-hover:border-[#FF5500]/40 border border-white/10 flex items-center justify-center text-zinc-400 group-hover:text-[#FF5500] transition-all mb-3">
+            <div className="w-12 h-12 rounded-2xl bg-white group-hover:bg-[#FF5A00]/10 border border-gray-200 group-hover:border-[#FF5A00]/40 flex items-center justify-center text-gray-400 group-hover:text-[#FF5A00] transition-all mb-2.5 shadow-xs">
               <UploadCloud className="w-6 h-6" />
             </div>
-            <span className="text-xs font-bold text-white uppercase tracking-wider group-hover:text-[#FF5500] transition-colors">
-              Click or drag image to upload to Cloudinary
+            <span className="text-xs font-bold text-gray-800 uppercase tracking-wider group-hover:text-[#FF5A00] transition-colors">
+              Click or drag image to upload
             </span>
-            <span className="text-[11px] text-zinc-500 mt-1">
-              Supports JPG, PNG, WebP, SVG (Max 10MB)
+            <span className="text-[11px] text-gray-400 mt-0.5">
+              Supports JPG, PNG, WebP (Max 10MB)
             </span>
           </div>
         )}
@@ -169,21 +181,21 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
 
       {/* Loading state */}
       {isUploading && (
-        <div className="flex items-center gap-2 text-xs text-[#FF5500] font-semibold py-1">
+        <div className="flex items-center gap-2 text-xs text-[#FF5A00] font-semibold py-1">
           <Loader2 className="w-3.5 h-3.5 animate-spin" />
-          <span>Uploading directly to Cloudinary...</span>
+          <span>Uploading directly to cloud storage...</span>
         </div>
       )}
 
       {/* Status Messages */}
       {successMsg && (
-        <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-semibold py-1">
+        <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-semibold py-1">
           <Check className="w-3.5 h-3.5" />
           <span>{successMsg}</span>
         </div>
       )}
       {errorMsg && (
-        <div className="flex items-center gap-1.5 text-xs text-rose-400 font-semibold py-1">
+        <div className="flex items-center gap-1.5 text-xs text-rose-600 font-semibold py-1">
           <AlertCircle className="w-3.5 h-3.5 shrink-0" />
           <span>{errorMsg}</span>
         </div>

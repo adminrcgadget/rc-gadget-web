@@ -14,6 +14,8 @@ import {
   Image as ImageIcon,
   ExternalLink,
   Sparkles,
+  Smartphone,
+  Monitor,
 } from "lucide-react";
 
 export default function AdminBannersPage() {
@@ -39,8 +41,8 @@ export default function AdminBannersPage() {
       const slots: Banner[] = [
         {
           id: dbBanners[0]?.id || "slot-1",
-          title: dbBanners[0]?.title || "NEW ARRIVALS",
-          subtitle: dbBanners[0]?.subtitle || "Latest RC models just landed",
+          title: dbBanners[0]?.title || "Banner Slot 1",
+          subtitle: dbBanners[0]?.subtitle || "",
           description: dbBanners[0]?.description || "",
           image_url: dbBanners[0]?.image_url || null,
           desktop_image_url: dbBanners[0]?.desktop_image_url || null,
@@ -55,13 +57,13 @@ export default function AdminBannersPage() {
         },
         {
           id: dbBanners[1]?.id || "slot-2",
-          title: dbBanners[1]?.title || "UP TO 20% OFF",
-          subtitle: dbBanners[1]?.subtitle || "On selected RC Accessories",
+          title: dbBanners[1]?.title || "Banner Slot 2",
+          subtitle: dbBanners[1]?.subtitle || "",
           description: dbBanners[1]?.description || "",
           image_url: dbBanners[1]?.image_url || null,
           desktop_image_url: dbBanners[1]?.desktop_image_url || null,
           mobile_image_url: dbBanners[1]?.mobile_image_url || null,
-          button_text: dbBanners[1]?.button_text || "SHOP ACCESSORIES",
+          button_text: dbBanners[1]?.button_text || "SHOP DEALS",
           button_url: dbBanners[1]?.button_url || "#featured-products",
           position: "featured",
           is_active: dbBanners[1]?.is_active ?? true,
@@ -71,13 +73,13 @@ export default function AdminBannersPage() {
         },
         {
           id: dbBanners[2]?.id || "slot-3",
-          title: dbBanners[2]?.title || "TRACKS & EXPERIENCE",
-          subtitle: dbBanners[2]?.subtitle || "Visit our RC tracks & experience the thrill",
+          title: dbBanners[2]?.title || "Banner Slot 3",
+          subtitle: dbBanners[2]?.subtitle || "",
           description: dbBanners[2]?.description || "",
           image_url: dbBanners[2]?.image_url || null,
           desktop_image_url: dbBanners[2]?.desktop_image_url || null,
           mobile_image_url: dbBanners[2]?.mobile_image_url || null,
-          button_text: dbBanners[2]?.button_text || "BOOK TRACK TIME",
+          button_text: dbBanners[2]?.button_text || "LEARN MORE",
           button_url: dbBanners[2]?.button_url || "#experience",
           position: "featured",
           is_active: dbBanners[2]?.is_active ?? true,
@@ -100,36 +102,45 @@ export default function AdminBannersPage() {
   }, []);
 
   const handleSaveSlot = async (index: number) => {
-    const slot = banners[index];
-    if (!slot) return;
+    const banner = banners[index];
+    if (!banner) return;
 
     setSavingSlot(index);
     setStatusMsg(null);
 
     try {
       const payload: any = {
-        title: slot.title || `Banner Slot ${index + 1}`,
-        subtitle: slot.subtitle || "",
-        description: slot.description || "",
-        image_url: slot.image_url || null,
-        desktop_image_url: slot.desktop_image_url || slot.image_url || null,
-        mobile_image_url: slot.mobile_image_url || slot.image_url || null,
-        button_text: slot.button_text || "EXPLORE NOW",
-        button_url: slot.button_url || "#featured-products",
+        title: banner.title || `Promo Banner ${index + 1}`,
+        subtitle: banner.subtitle || "",
+        description: banner.description || "",
+        desktop_image_url:
+          typeof banner.desktop_image_url === "string" &&
+          banner.desktop_image_url.trim().length > 0
+            ? banner.desktop_image_url.trim()
+            : null,
+        mobile_image_url:
+          typeof banner.mobile_image_url === "string" &&
+          banner.mobile_image_url.trim().length > 0
+            ? banner.mobile_image_url.trim()
+            : null,
+        image_url:
+          banner.desktop_image_url || banner.mobile_image_url || null,
+        button_text: banner.button_text || "EXPLORE NOW",
+        button_url: banner.button_url || "#featured-products",
         position: "featured",
-        is_active: slot.is_active ?? true,
+        is_active: banner.is_active ?? true,
         sort_order: index + 1,
         updated_at: new Date().toISOString(),
       };
 
       const isUuid =
-        slot.id &&
+        banner.id &&
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-          slot.id
+          banner.id
         );
 
       if (isUuid) {
-        payload.id = slot.id;
+        payload.id = banner.id;
         const { error } = await (supabase.from("banners") as any)
           .upsert(payload)
           .select();
@@ -149,44 +160,50 @@ export default function AdminBannersPage() {
 
       setStatusMsg({
         type: "success",
-        text: `Banner Slot ${index + 1} (${slot.title}) saved and published live!`,
+        text: `Banner Slot ${index + 1} published live to storefront!`,
       });
     } catch (err: any) {
-      console.error("Error saving banner slot:", err);
+      console.error("Error saving banner:", err);
       setStatusMsg({
         type: "error",
-        text: err.message || `Failed to save Banner Slot ${index + 1}`,
+        text: err.message || `Failed to save banner slot ${index + 1}`,
       });
     } finally {
       setSavingSlot(null);
     }
   };
 
-  const updateBannerState = (index: number, updates: Partial<Banner>) => {
+  const updateBannerField = (
+    index: number,
+    field: keyof Banner,
+    value: any
+  ) => {
     setBanners((prev) =>
-      prev.map((item, idx) => (idx === index ? { ...item, ...updates } : item))
+      prev.map((item, idx) =>
+        idx === index ? { ...item, [field]: value } : item
+      )
     );
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-in fade-in">
       <AdminHeader
-        title="3 Promotional Banner Slots Management"
-        subtitle="Upload your custom full-photo creatives, separate mobile banners, and configure direct action links for the 3 slots under Featured Products"
+        title="3 Promotional Banners"
+        subtitle="Manage the 3 graphic promotional banners displayed directly below the featured products section"
       />
 
       {statusMsg && (
         <div
           className={`p-4 rounded-2xl border text-xs sm:text-sm font-semibold flex items-center gap-2.5 ${
             statusMsg.type === "success"
-              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-              : "bg-rose-500/10 border-rose-500/30 text-rose-400"
+              ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+              : "bg-rose-50 border-rose-200 text-rose-800"
           }`}
         >
           {statusMsg.type === "success" ? (
-            <Check className="w-4 h-4 shrink-0" />
+            <Check className="w-4 h-4 shrink-0 text-emerald-600" />
           ) : (
-            <AlertCircle className="w-4 h-4 shrink-0" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
           )}
           <span>{statusMsg.text}</span>
         </div>
@@ -194,208 +211,135 @@ export default function AdminBannersPage() {
 
       {isLoading ? (
         <div className="p-16 flex justify-center">
-          <Loader2 className="w-8 h-8 text-[#FF5500] animate-spin" />
+          <Loader2 className="w-8 h-8 text-[#FF5A00] animate-spin" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {banners.map((banner, idx) => {
-            const isSaving = savingSlot === idx;
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {banners.map((banner, index) => {
+            const hasImage = Boolean(
+              banner.desktop_image_url || banner.mobile_image_url
+            );
 
             return (
               <div
-                key={banner.id || idx}
-                className="rounded-3xl bg-[#0E0E0E] border border-white/10 p-6 flex flex-col justify-between space-y-6 shadow-2xl hover:border-[#FF5500]/40 transition-all"
+                key={banner.id || index}
+                className="rounded-2xl bg-white border border-gray-200/80 shadow-xs hover:shadow-md transition-shadow p-6 flex flex-col justify-between space-y-6"
               >
                 <div className="space-y-5">
                   {/* Slot Header */}
-                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-lg bg-[#FF5500]/20 text-[#FF5500] font-black text-xs flex items-center justify-center">
-                        {idx + 1}
+                  <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-7 h-7 rounded-xl bg-orange-50 text-[#FF5A00] font-black text-xs flex items-center justify-center border border-orange-100">
+                        {index + 1}
                       </div>
-                      <h3 className="text-sm font-black uppercase tracking-wider text-white">
-                        Banner Slot {idx + 1}
+                      <h3 className="text-sm font-black uppercase tracking-wider text-gray-900">
+                        Banner Slot {index + 1}
                       </h3>
                     </div>
 
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
-                      Live on Homepage
+                    <span
+                      className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
+                        hasImage
+                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                          : "bg-gray-100 text-gray-500"
+                      }`}
+                    >
+                      {hasImage ? "Active Image" : "Empty Slot"}
                     </span>
                   </div>
 
-                  {/* Desktop Banner Image Upload */}
+                  {/* Desktop Image Uploader */}
                   <div className="space-y-2">
-                    <label className="text-xs font-black uppercase tracking-wider text-zinc-300 block flex items-center justify-between">
-                      <span>Desktop Banner Image (Aspect 16:7)</span>
-                    </label>
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-gray-700">
+                      <Monitor className="w-3.5 h-3.5 text-[#FF5A00]" />
+                      <span>Desktop Banner Image</span>
+                    </div>
                     <ImageUploader
-                      label=""
-                      folder="promos"
-                      currentUrl={banner.image_url}
-                      onUploadSuccess={(url) =>
-                        updateBannerState(idx, {
-                          image_url: url,
-                          desktop_image_url: url,
-                        })
-                      }
-                      onRemove={() =>
-                        updateBannerState(idx, {
-                          image_url: null,
-                          desktop_image_url: null,
-                        })
-                      }
+                      folder="banners"
+                      currentUrl={banner.desktop_image_url}
+                      onUploadSuccess={(url) => {
+                        updateBannerField(index, "desktop_image_url", url);
+                        if (!banner.mobile_image_url) {
+                          updateBannerField(index, "mobile_image_url", url);
+                        }
+                      }}
+                      onRemove={() => {
+                        updateBannerField(index, "desktop_image_url", null);
+                      }}
                     />
                   </div>
 
-                  {/* Mobile Banner Image Upload (Optional) */}
-                  <div className="space-y-2 pt-2 border-t border-white/5">
-                    <label className="text-xs font-black uppercase tracking-wider text-zinc-400 block">
-                      Mobile Banner Image (Optional)
-                    </label>
+                  {/* Mobile Image Uploader */}
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-gray-700">
+                      <Smartphone className="w-3.5 h-3.5 text-[#FF5A00]" />
+                      <span>Mobile Banner Image (Optional)</span>
+                    </div>
                     <ImageUploader
-                      label=""
-                      folder="promos"
+                      folder="banners"
                       currentUrl={banner.mobile_image_url}
-                      onUploadSuccess={(url) =>
-                        updateBannerState(idx, { mobile_image_url: url })
-                      }
-                      onRemove={() =>
-                        updateBannerState(idx, { mobile_image_url: null })
-                      }
+                      onUploadSuccess={(url) => {
+                        updateBannerField(index, "mobile_image_url", url);
+                      }}
+                      onRemove={() => {
+                        updateBannerField(index, "mobile_image_url", null);
+                      }}
                     />
                   </div>
 
-                  {/* Title */}
-                  <div className="space-y-1.5 pt-2 border-t border-white/5">
-                    <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
-                      Headline / Title
-                    </label>
-                    <input
-                      type="text"
-                      value={banner.title || ""}
-                      onChange={(e) => updateBannerState(idx, { title: e.target.value })}
-                      placeholder="e.g. NEW ARRIVALS"
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#161616] border border-white/10 text-white text-xs outline-none focus:border-[#FF5500]"
-                    />
-                  </div>
+                  {/* Settings */}
+                  <div className="space-y-4 pt-2 border-t border-gray-100">
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold uppercase tracking-wider text-gray-600">
+                        Banner Title / Label
+                      </label>
+                      <input
+                        type="text"
+                        value={banner.title || ""}
+                        onChange={(e) =>
+                          updateBannerField(index, "title", e.target.value)
+                        }
+                        placeholder={`Banner ${index + 1} Title`}
+                        className="w-full px-3.5 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 text-xs outline-none focus:border-[#FF5A00] focus:bg-white transition-colors"
+                      />
+                    </div>
 
-                  {/* Subtitle */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
-                      Subtitle / Tagline
-                    </label>
-                    <input
-                      type="text"
-                      value={banner.subtitle || ""}
-                      onChange={(e) => updateBannerState(idx, { subtitle: e.target.value })}
-                      placeholder="e.g. Latest RC models just landed"
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#161616] border border-white/10 text-white text-xs outline-none focus:border-[#FF5500]"
-                    />
-                  </div>
-
-                  {/* Description */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
-                      Description (optional)
-                    </label>
-                    <textarea
-                      value={banner.description || ""}
-                      onChange={(e) => updateBannerState(idx, { description: e.target.value })}
-                      placeholder="Short promo description..."
-                      rows={2}
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#161616] border border-white/10 text-white text-xs outline-none focus:border-[#FF5500] resize-none"
-                    />
-                  </div>
-
-                  {/* Button Text */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
-                      Button Label
-                    </label>
-                    <input
-                      type="text"
-                      value={banner.button_text || ""}
-                      onChange={(e) => updateBannerState(idx, { button_text: e.target.value })}
-                      placeholder="e.g. EXPLORE NOW"
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#161616] border border-white/10 text-white text-xs outline-none focus:border-[#FF5500]"
-                    />
-                  </div>
-
-                  {/* Destination Link */}
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
-                      Destination Link / Target URL
-                    </label>
-                    <input
-                      type="text"
-                      value={banner.button_url || ""}
-                      onChange={(e) => updateBannerState(idx, { button_url: e.target.value })}
-                      placeholder="e.g. #featured-products or #experience"
-                      className="w-full px-4 py-2.5 rounded-xl bg-[#161616] border border-white/10 text-white text-xs outline-none focus:border-[#FF5500]"
-                    />
-                  </div>
-
-                  {/* Live Preview */}
-                  <div className="space-y-2 pt-2 border-t border-white/5">
-                    <label className="text-xs font-black uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
-                      <Sparkles className="w-3 h-3 text-[#FF5500]" />
-                      Live Preview
-                    </label>
-                    <div
-                      className="relative w-full aspect-[16/7] rounded-xl overflow-hidden border border-white/10 bg-zinc-900 flex items-end"
-                      style={banner.image_url ? { backgroundImage: `url(${banner.image_url})`, backgroundSize: "cover", backgroundPosition: "center" } : {}}
-                    >
-                      {/* Dark gradient overlay for readability */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-
-                      {!banner.image_url && (
-                        <div className="absolute inset-0 flex items-center justify-center text-zinc-600">
-                          <ImageIcon className="w-8 h-8" />
-                        </div>
-                      )}
-
-                      {/* Text overlay — fixed at bottom left */}
-                      <div className="relative z-10 p-4 space-y-1">
-                        {banner.title && (
-                          <p className="text-[10px] font-black uppercase tracking-widest text-[#FF5500]">{banner.title}</p>
-                        )}
-                        {banner.subtitle && (
-                          <p className="text-sm font-black text-white leading-tight">{banner.subtitle}</p>
-                        )}
-                        {banner.description && (
-                          <p className="text-[10px] text-white/70 leading-snug max-w-[200px]">{banner.description}</p>
-                        )}
-                        {banner.button_text && (
-                          <div className="mt-2 inline-flex items-center px-3 py-1 rounded-full bg-[#FF5500] text-white text-[9px] font-black uppercase tracking-wider">
-                            {banner.button_text}
-                          </div>
-                        )}
-                      </div>
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold uppercase tracking-wider text-gray-600">
+                        Target Link / Action URL
+                      </label>
+                      <input
+                        type="text"
+                        value={banner.button_url || ""}
+                        onChange={(e) =>
+                          updateBannerField(index, "button_url", e.target.value)
+                        }
+                        placeholder="#featured-products"
+                        className="w-full px-3.5 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 text-xs outline-none focus:border-[#FF5A00] focus:bg-white transition-colors"
+                      />
                     </div>
                   </div>
                 </div>
 
                 {/* Save Button */}
-                <div className="pt-4 border-t border-white/10">
-                  <button
-                    type="button"
-                    disabled={isSaving}
-                    onClick={() => handleSaveSlot(idx)}
-                    className="w-full py-3 rounded-xl font-black text-xs uppercase tracking-wider text-white bg-[#FF5500] hover:bg-[#FF6A1A] shadow-lg shadow-[#FF5500]/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                  >
-                    {isSaving ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Publishing Slot {idx + 1}...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-4 h-4" />
-                        <span>Save &amp; Publish Slot {idx + 1}</span>
-                      </>
-                    )}
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  disabled={savingSlot === index}
+                  onClick={() => handleSaveSlot(index)}
+                  className="w-full py-3 rounded-xl font-black text-xs uppercase tracking-wider text-white bg-[#FF5A00] hover:bg-[#FF6A00] shadow-md shadow-[#FF5A00]/25 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  {savingSlot === index ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Saving Slot {index + 1}...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-3.5 h-3.5" />
+                      <span>Save &amp; Publish Slot {index + 1}</span>
+                    </>
+                  )}
+                </button>
               </div>
             );
           })}

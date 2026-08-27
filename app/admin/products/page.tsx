@@ -595,7 +595,7 @@ export default function AdminProductsPage() {
   ).filter(Boolean);
 
   return (
-    <div className="space-y-8 bg-black text-white">
+    <div className="space-y-8 animate-in fade-in">
       <AdminHeader
         title="Products Catalog & Inventory"
         subtitle="Add, edit, upload product photos, configure pricing, badges, stock, and manage live storefront listings"
@@ -620,58 +620,58 @@ export default function AdminProductsPage() {
 
       {/* Overview Stat Widgets */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="p-4 rounded-2xl bg-[#0E0E0E] border border-zinc-800 flex items-center justify-between">
+        <div className="p-4 rounded-2xl bg-white border border-gray-200/80 shadow-xs flex items-center justify-between">
           <div>
-            <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 block">
+            <span className="text-[10px] font-black uppercase tracking-wider text-gray-500 block">
               Total Products
             </span>
-            <span className="text-xl sm:text-2xl font-black text-white">
+            <span className="text-xl sm:text-2xl font-black text-gray-900">
               {products.length}
             </span>
           </div>
-          <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-[#FF5A00]">
+          <div className="p-2.5 rounded-xl bg-orange-50 border border-orange-100 text-[#FF5A00]">
             <Package className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#0E0E0E] border border-zinc-800 flex items-center justify-between">
+        <div className="p-4 rounded-2xl bg-white border border-gray-200/80 shadow-xs flex items-center justify-between">
           <div>
-            <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 block">
+            <span className="text-[10px] font-black uppercase tracking-wider text-gray-500 block">
               Best Sellers
             </span>
-            <span className="text-xl sm:text-2xl font-black text-amber-400">
+            <span className="text-xl sm:text-2xl font-black text-amber-600">
               {products.filter((p) => p.is_bestseller).length}
             </span>
           </div>
-          <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-amber-400">
+          <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-100 text-amber-600">
             <Flame className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#0E0E0E] border border-zinc-800 flex items-center justify-between">
+        <div className="p-4 rounded-2xl bg-white border border-gray-200/80 shadow-xs flex items-center justify-between">
           <div>
-            <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 block">
+            <span className="text-[10px] font-black uppercase tracking-wider text-gray-500 block">
               New Arrivals
             </span>
-            <span className="text-xl sm:text-2xl font-black text-blue-400">
+            <span className="text-xl sm:text-2xl font-black text-blue-600">
               {products.filter((p) => p.is_new_arrival).length}
             </span>
           </div>
-          <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-blue-400">
+          <div className="p-2.5 rounded-xl bg-blue-50 border border-blue-100 text-blue-600">
             <Sparkles className="w-5 h-5" />
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#0E0E0E] border border-zinc-800 flex items-center justify-between">
+        <div className="p-4 rounded-2xl bg-white border border-gray-200/80 shadow-xs flex items-center justify-between">
           <div>
-            <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 block">
+            <span className="text-[10px] font-black uppercase tracking-wider text-gray-500 block">
               Active Listed
             </span>
-            <span className="text-xl sm:text-2xl font-black text-emerald-400">
+            <span className="text-xl sm:text-2xl font-black text-emerald-600">
               {products.filter((p) => p.is_active).length}
             </span>
           </div>
-          <div className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-emerald-400">
+          <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600">
             <Eye className="w-5 h-5" />
           </div>
         </div>
@@ -682,18 +682,18 @@ export default function AdminProductsPage() {
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
           {/* Search Box */}
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by title, brand, category..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#0E0E0E] border border-zinc-800 focus:border-[#FF5A00] text-xs font-semibold text-white outline-none placeholder:text-zinc-500"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:border-[#FF5A00] text-xs font-semibold text-gray-900 outline-none placeholder:text-gray-400 shadow-xs"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -704,7 +704,7 @@ export default function AdminProductsPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={handleOpenAdd}
-              className="w-full md:w-auto px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider text-white bg-[#FF5A00] hover:bg-[#FF6A00] shadow-lg shadow-[#FF5A00]/25 transition-all flex items-center justify-center gap-2 shrink-0 active:scale-95"
+              className="w-full md:w-auto px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white bg-[#FF5A00] hover:bg-[#FF6A00] shadow-md shadow-[#FF5A00]/25 transition-all flex items-center justify-center gap-2 shrink-0 active:scale-95 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Add New Product</span>
@@ -713,8 +713,8 @@ export default function AdminProductsPage() {
         </div>
 
         {/* Filter Pills */}
-        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-zinc-800/80">
-          <span className="text-[10px] font-black uppercase tracking-wider text-zinc-400 mr-1">
+        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-gray-200/80">
+          <span className="text-[10px] font-black uppercase tracking-wider text-gray-500 mr-1">
             Status:
           </span>
           {(
@@ -729,10 +729,10 @@ export default function AdminProductsPage() {
             <button
               key={tab.id}
               onClick={() => setSelectedFilter(tab.id)}
-              className={`px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+              className={`px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
                 selectedFilter === tab.id
                   ? "bg-[#FF5A00] text-white shadow-xs"
-                  : "bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800"
+                  : "bg-white text-gray-600 hover:text-gray-900 border border-gray-200"
               }`}
             >
               {tab.label}
@@ -743,7 +743,7 @@ export default function AdminProductsPage() {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-1 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-bold text-zinc-300 outline-none focus:border-[#FF5A00]"
+              className="px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-xs font-bold text-gray-700 outline-none focus:border-[#FF5A00] shadow-xs"
             >
               <option value="ALL">All Categories ({products.length})</option>
               {uniqueCategories.map((cat) => (
@@ -762,17 +762,17 @@ export default function AdminProductsPage() {
           <Loader2 className="w-8 h-8 text-[#FF5A00] animate-spin" />
         </div>
       ) : filteredProducts.length === 0 ? (
-        <div className="p-12 text-center rounded-3xl bg-[#0E0E0E] border border-zinc-800 space-y-3">
-          <Package className="w-10 h-10 text-zinc-600 mx-auto" />
-          <h4 className="text-sm font-bold text-white uppercase">
+        <div className="p-12 text-center rounded-2xl bg-white border border-gray-200 shadow-xs space-y-3">
+          <Package className="w-10 h-10 text-gray-300 mx-auto" />
+          <h4 className="text-sm font-bold text-gray-800 uppercase">
             No products match your search or filter
           </h4>
-          <p className="text-xs text-zinc-400">
+          <p className="text-xs text-gray-500">
             Try adjusting your search criteria or add a new product.
           </p>
           <button
             onClick={handleOpenAdd}
-            className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-[#FF5A00] text-white"
+            className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold bg-[#FF5A00] text-white cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Product</span>
@@ -787,13 +787,13 @@ export default function AdminProductsPage() {
             return (
               <div
                 key={product.id || idx}
-                className={`group rounded-3xl bg-[#0E0E0E] border ${
-                  product.is_active ? "border-zinc-800" : "border-zinc-800/40 opacity-60"
-                } p-5 flex flex-col justify-between space-y-4 hover:border-[#FF5A00]/50 transition-all shadow-xl relative overflow-hidden`}
+                className={`group rounded-2xl bg-white border ${
+                  product.is_active ? "border-gray-200/80" : "border-gray-200 opacity-60"
+                } p-5 flex flex-col justify-between space-y-4 hover:border-[#FF5A00]/50 hover:shadow-md transition-all shadow-xs relative overflow-hidden`}
               >
                 <div>
                   {/* Photo Thumbnail with Direct 1-Click Upload Overlay */}
-                  <div className="relative w-full h-44 rounded-2xl overflow-hidden bg-[#050505] border border-zinc-800/80 mb-3 flex items-center justify-center p-3 group/img">
+                  <div className="relative w-full h-44 rounded-xl overflow-hidden bg-gray-50 border border-gray-100 mb-3 flex items-center justify-center p-3 group/img">
                     {product.image_url ? (
                       <Image
                         src={product.image_url}
@@ -803,9 +803,9 @@ export default function AdminProductsPage() {
                         className="object-contain p-2 transition-transform duration-300 group-hover/img:scale-105"
                       />
                     ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center text-zinc-600 gap-1.5 select-none">
-                        <Package className="w-8 h-8 text-[#FF5A00]" />
-                        <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
+                      <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 gap-1.5 select-none">
+                        <Package className="w-7 h-7 text-[#FF5A00]" />
+                        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
                           No Photo Uploaded
                         </span>
                       </div>
@@ -813,17 +813,17 @@ export default function AdminProductsPage() {
 
                     {/* Badge Pill Top-Left */}
                     {product.badge && (
-                      <div className="absolute top-2.5 left-2.5 bg-[#FF5A00] text-white px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider shadow-md">
+                      <div className="absolute top-2.5 left-2.5 bg-[#FF5A00] text-white px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider shadow-xs">
                         {product.badge}
                       </div>
                     )}
 
                     {/* Active/Hidden Status Top-Right */}
                     <div
-                      className={`absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${
+                      className={`absolute top-2.5 right-2.5 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${
                         product.is_active
-                          ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40"
-                          : "bg-zinc-800 text-zinc-400 border border-zinc-700"
+                          ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                          : "bg-gray-100 text-gray-500 border border-gray-200"
                       }`}
                     >
                       {product.is_active ? "Active" : "Hidden"}
@@ -831,30 +831,27 @@ export default function AdminProductsPage() {
 
                     {/* Loading State Overlay */}
                     {isThisCardUploading && (
-                      <div className="absolute inset-0 bg-black/85 backdrop-blur-sm flex flex-col items-center justify-center gap-2 text-[#FF5A00] z-20">
+                      <div className="absolute inset-0 bg-white/90 backdrop-blur-xs flex flex-col items-center justify-center gap-2 text-[#FF5A00] z-20">
                         <Loader2 className="w-6 h-6 animate-spin" />
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-white">
-                          Uploading &amp; Saving...
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-800">
+                          Uploading...
                         </span>
                       </div>
                     )}
 
                     {/* Hover 1-Click Upload Overlay */}
                     {!isThisCardUploading && (
-                      <div className="absolute inset-0 bg-black/75 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3 z-10">
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/img:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 p-3 z-10 backdrop-blur-2xs">
                         <button
                           type="button"
                           onClick={() =>
                             cardFileInputRefs.current[product.id]?.click()
                           }
-                          className="px-3.5 py-1.5 rounded-xl bg-[#FF5A00] hover:bg-[#FF6A00] text-white text-[11px] font-black uppercase tracking-wider shadow-lg flex items-center gap-1.5 transition-transform hover:scale-105"
+                          className="px-3 py-1.5 rounded-xl bg-[#FF5A00] hover:bg-[#FF6A00] text-white text-[11px] font-black uppercase tracking-wider shadow-md flex items-center gap-1.5 transition-transform hover:scale-105 cursor-pointer"
                         >
-                          <Upload className="w-3.5 h-3.5" />
+                          <Upload className="w-3 h-3" />
                           <span>Change Photo</span>
                         </button>
-                        <span className="text-[9px] text-zinc-400">
-                          PNG, WebP, JPG
-                        </span>
                       </div>
                     )}
 
@@ -881,13 +878,13 @@ export default function AdminProductsPage() {
                     <span className="text-[#FF5A00]">
                       {product.brand_name || "RC GADGETS"}
                     </span>
-                    <span className="text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">
+                    <span className="text-gray-600 bg-gray-100 px-2 py-0.5 rounded">
                       {product.category_name}
                     </span>
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-sm font-bold text-white line-clamp-2 leading-snug">
+                  <h3 className="text-sm font-bold text-gray-900 line-clamp-2 leading-snug">
                     {product.title}
                   </h3>
 
@@ -911,29 +908,29 @@ export default function AdminProductsPage() {
                   </div>
 
                   {/* Price & Rating */}
-                  <div className="flex items-end justify-between gap-2 mt-3 pt-3 border-t border-zinc-800/80">
+                  <div className="flex items-end justify-between gap-2 mt-3 pt-3 border-t border-gray-100">
                     <div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-base font-black text-white">
+                        <span className="text-base font-black text-gray-900">
                           ₹{Number(product.price).toLocaleString("en-IN")}
                         </span>
                         {product.original_price && (
-                          <span className="text-xs text-zinc-500 line-through">
+                          <span className="text-xs text-gray-400 line-through">
                             ₹{Number(product.original_price).toLocaleString("en-IN")}
                           </span>
                         )}
                       </div>
                       {discount && (
-                        <span className="text-[10px] font-bold text-emerald-400">
+                        <span className="text-[10px] font-bold text-emerald-600">
                           {discount}% OFF
                         </span>
                       )}
                     </div>
 
-                    <div className="flex items-center gap-1 text-xs text-amber-400 font-bold">
+                    <div className="flex items-center gap-1 text-xs text-amber-500 font-bold">
                       <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                       <span>{product.rating}</span>
-                      <span className="text-[10px] text-zinc-500 font-normal">
+                      <span className="text-[10px] text-gray-400 font-normal">
                         ({product.reviews_count})
                       </span>
                     </div>
@@ -941,14 +938,14 @@ export default function AdminProductsPage() {
                 </div>
 
                 {/* Card Actions */}
-                <div className="pt-3 border-t border-zinc-800/80 flex items-center justify-between gap-2">
+                <div className="pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
                   <button
                     type="button"
                     onClick={() => handleToggleActive(product)}
-                    className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors ${
+                    className={`p-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer ${
                       product.is_active
-                        ? "text-zinc-400 hover:text-white"
-                        : "text-emerald-400 hover:text-emerald-300"
+                        ? "text-gray-400 hover:text-gray-700"
+                        : "text-emerald-600 hover:text-emerald-700"
                     }`}
                     title={
                       product.is_active
@@ -970,7 +967,7 @@ export default function AdminProductsPage() {
                     <button
                       type="button"
                       onClick={() => handleOpenEdit(product)}
-                      className="px-2.5 py-1.5 rounded-lg bg-[#FF5A00]/20 hover:bg-[#FF5A00] text-[#FF5A00] hover:text-white transition-all text-xs font-bold uppercase flex items-center gap-1"
+                      className="px-2.5 py-1.5 rounded-lg bg-orange-50 hover:bg-[#FF5A00] text-[#FF5A00] hover:text-white transition-all text-xs font-bold uppercase flex items-center gap-1 cursor-pointer"
                     >
                       <Edit2 className="w-3 h-3" />
                       <span>Edit</span>
@@ -979,7 +976,7 @@ export default function AdminProductsPage() {
                     <button
                       type="button"
                       onClick={() => setDeleteTarget(product)}
-                      className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors"
+                      className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 transition-colors cursor-pointer"
                       title="Delete Product"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -992,25 +989,22 @@ export default function AdminProductsPage() {
         </div>
       )}
 
-      {/* Add / Edit Product Modal */}
+      {/* Edit / Add Product Modal Dialog */}
       {isModalOpen && editingProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
-          <div className="w-full max-w-2xl bg-[#121212] border border-zinc-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 animate-in fade-in zoom-in-95 my-8 max-h-[90vh] overflow-y-auto">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-[#FF5A00]/20 border border-[#FF5A00]/40 text-[#FF5A00] flex items-center justify-center">
-                  <Package className="w-4 h-4" />
-                </div>
-                <h3 className="text-base font-black uppercase text-white tracking-wide">
-                  {editingProduct.id
-                    ? `Edit Product: ${editingProduct.title || ""}`
-                    : "Add New Product"}
-                </h3>
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-3xl border border-gray-200 max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl my-8 animate-in zoom-in-95 max-h-[90vh] overflow-y-auto text-gray-900">
+            <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+              <div>
+                <h2 className="text-lg font-black text-gray-900 uppercase tracking-wide">
+                  {editingProduct.id ? "Edit Product" : "Add New Product"}
+                </h2>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Configure vehicle details, pricing, tags, and photos
+                </p>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-zinc-800 transition-colors"
+                className="p-2 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1020,7 +1014,7 @@ export default function AdminProductsPage() {
             <form onSubmit={handleSaveProduct} className="space-y-4">
               {/* Product Title */}
               <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-wider text-zinc-400 flex items-center justify-between">
+                <label className="text-xs font-bold uppercase tracking-wider text-gray-700 flex items-center justify-between">
                   <span>
                     Product Title <span className="text-[#FF5A00]">*</span>
                   </span>
@@ -1033,14 +1027,14 @@ export default function AdminProductsPage() {
                   onChange={(e) =>
                     setEditingProduct({ ...editingProduct, title: e.target.value })
                   }
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#1A1A1A] border border-zinc-800 focus:border-[#FF5A00] text-white text-xs outline-none font-semibold"
+                  className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-[#FF5A00] focus:bg-white text-gray-900 text-xs outline-none font-semibold transition-colors"
                 />
               </div>
 
               {/* Category & Brand row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
+                  <label className="text-xs font-bold uppercase tracking-wider text-gray-700">
                     Category <span className="text-[#FF5A00]">*</span>
                   </label>
                   <input
@@ -1055,7 +1049,7 @@ export default function AdminProductsPage() {
                         category_name: e.target.value,
                       })
                     }
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#1A1A1A] border border-zinc-800 focus:border-[#FF5A00] text-white text-xs outline-none font-semibold"
+                    className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-[#FF5A00] focus:bg-white text-gray-900 text-xs outline-none font-semibold transition-colors"
                   />
                   <datalist id="category-options">
                     {uniqueCategories.map((c) => (
@@ -1065,7 +1059,7 @@ export default function AdminProductsPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
+                  <label className="text-xs font-bold uppercase tracking-wider text-gray-700">
                     Brand Name
                   </label>
                   <input
@@ -1078,7 +1072,7 @@ export default function AdminProductsPage() {
                         brand_name: e.target.value,
                       })
                     }
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#1A1A1A] border border-zinc-800 focus:border-[#FF5A00] text-white text-xs outline-none font-semibold"
+                    className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-[#FF5A00] focus:bg-white text-gray-900 text-xs outline-none font-semibold transition-colors"
                   />
                 </div>
               </div>
@@ -1086,7 +1080,7 @@ export default function AdminProductsPage() {
               {/* Pricing & Badges */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
+                  <label className="text-xs font-bold uppercase tracking-wider text-gray-700">
                     Selling Price (₹) <span className="text-[#FF5A00]">*</span>
                   </label>
                   <input
@@ -1101,12 +1095,12 @@ export default function AdminProductsPage() {
                         price: parseFloat(e.target.value) || 0,
                       })
                     }
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#1A1A1A] border border-zinc-800 focus:border-[#FF5A00] text-white text-xs outline-none font-bold"
+                    className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-[#FF5A00] focus:bg-white text-gray-900 text-xs outline-none font-bold transition-colors"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
+                  <label className="text-xs font-bold uppercase tracking-wider text-gray-700">
                     MRP / Original (₹)
                   </label>
                   <input
@@ -1122,12 +1116,12 @@ export default function AdminProductsPage() {
                           : null,
                       })
                     }
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#1A1A1A] border border-zinc-800 focus:border-[#FF5A00] text-white text-xs outline-none"
+                    className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-[#FF5A00] focus:bg-white text-gray-900 text-xs outline-none transition-colors"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
+                  <label className="text-xs font-bold uppercase tracking-wider text-gray-700">
                     Badge Tag
                   </label>
                   <input
@@ -1140,14 +1134,14 @@ export default function AdminProductsPage() {
                         badge: e.target.value.toUpperCase(),
                       })
                     }
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#1A1A1A] border border-zinc-800 focus:border-[#FF5A00] text-white text-xs outline-none font-bold"
+                    className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-[#FF5A00] focus:bg-white text-gray-900 text-xs outline-none font-bold transition-colors"
                   />
                 </div>
               </div>
 
               {/* Quick Badge Selection helper pills */}
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[10px] text-zinc-500 font-bold uppercase">
+                <span className="text-[10px] text-gray-500 font-bold uppercase">
                   Quick Badges:
                 </span>
                 {["HOT", "NEW", "SALE", "POPULAR", "BEST", "20% OFF"].map(
@@ -1158,7 +1152,7 @@ export default function AdminProductsPage() {
                       onClick={() =>
                         setEditingProduct({ ...editingProduct, badge: b })
                       }
-                      className="px-2 py-0.5 rounded bg-zinc-900 hover:bg-[#FF5A00] hover:text-white text-zinc-400 text-[10px] font-black uppercase border border-zinc-800 transition-colors"
+                      className="px-2 py-0.5 rounded bg-gray-100 hover:bg-[#FF5A00] hover:text-white text-gray-600 text-[10px] font-bold uppercase border border-gray-200 transition-colors cursor-pointer"
                     >
                       {b}
                     </button>
@@ -1170,7 +1164,7 @@ export default function AdminProductsPage() {
                     onClick={() =>
                       setEditingProduct({ ...editingProduct, badge: null })
                     }
-                    className="px-2 py-0.5 rounded bg-zinc-900 text-rose-400 text-[10px] font-bold uppercase border border-zinc-800"
+                    className="px-2 py-0.5 rounded bg-rose-50 text-rose-600 text-[10px] font-bold uppercase border border-rose-200 cursor-pointer"
                   >
                     Clear Badge
                   </button>
@@ -1178,9 +1172,9 @@ export default function AdminProductsPage() {
               </div>
 
               {/* Product Photo Upload */}
-              <div className="space-y-2 pt-2 border-t border-zinc-800">
+              <div className="space-y-2 pt-2 border-t border-gray-100">
                 <ImageUploader
-                  label="Product Photo (Cloudinary CDN Upload)"
+                  label="Product Photo"
                   bucket="products"
                   folder="products"
                   currentUrl={editingProduct.image_url}
@@ -1202,7 +1196,7 @@ export default function AdminProductsPage() {
 
               {/* Description */}
               <div className="space-y-1.5">
-                <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
+                <label className="text-xs font-bold uppercase tracking-wider text-gray-700">
                   Product Description / Specifications
                 </label>
                 <textarea
@@ -1215,14 +1209,14 @@ export default function AdminProductsPage() {
                       description: e.target.value,
                     })
                   }
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#1A1A1A] border border-zinc-800 focus:border-[#FF5A00] text-white text-xs outline-none resize-none"
+                  className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-[#FF5A00] focus:bg-white text-gray-900 text-xs outline-none resize-none transition-colors"
                 />
               </div>
 
               {/* Stock, Rating, Sort Order */}
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
+                  <label className="text-xs font-bold uppercase tracking-wider text-gray-700">
                     Stock Units
                   </label>
                   <input
@@ -1235,12 +1229,12 @@ export default function AdminProductsPage() {
                         stock_quantity: parseInt(e.target.value) || 0,
                       })
                     }
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#1A1A1A] border border-zinc-800 focus:border-[#FF5A00] text-white text-xs outline-none font-semibold"
+                    className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-[#FF5A00] focus:bg-white text-gray-900 text-xs outline-none font-semibold transition-colors"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
+                  <label className="text-xs font-bold uppercase tracking-wider text-gray-700">
                     Rating (0-5)
                   </label>
                   <input
@@ -1255,12 +1249,12 @@ export default function AdminProductsPage() {
                         rating: parseFloat(e.target.value) || 5.0,
                       })
                     }
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#1A1A1A] border border-zinc-800 focus:border-[#FF5A00] text-white text-xs outline-none font-semibold"
+                    className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-[#FF5A00] focus:bg-white text-gray-900 text-xs outline-none font-semibold transition-colors"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
+                  <label className="text-xs font-bold uppercase tracking-wider text-gray-700">
                     Sort Order
                   </label>
                   <input
@@ -1272,13 +1266,13 @@ export default function AdminProductsPage() {
                         sort_order: parseInt(e.target.value) || 1,
                       })
                     }
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#1A1A1A] border border-zinc-800 focus:border-[#FF5A00] text-white text-xs outline-none font-semibold"
+                    className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-[#FF5A00] focus:bg-white text-gray-900 text-xs outline-none font-semibold transition-colors"
                   />
                 </div>
               </div>
 
               {/* Status Flags Checkboxes */}
-              <div className="p-4 rounded-2xl bg-[#161616] border border-zinc-800 grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="p-4 rounded-2xl bg-gray-50 border border-gray-200 grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
@@ -1291,7 +1285,7 @@ export default function AdminProductsPage() {
                     }
                     className="w-4 h-4 text-[#FF5A00] accent-[#FF5A00] rounded"
                   />
-                  <span className="text-[11px] font-bold uppercase text-white">
+                  <span className="text-[11px] font-bold uppercase text-gray-800">
                     Live Visible
                   </span>
                 </label>
@@ -1308,7 +1302,7 @@ export default function AdminProductsPage() {
                     }
                     className="w-4 h-4 text-[#FF5A00] accent-[#FF5A00] rounded"
                   />
-                  <span className="text-[11px] font-bold uppercase text-amber-400">
+                  <span className="text-[11px] font-bold uppercase text-amber-600">
                     Best Seller
                   </span>
                 </label>
@@ -1325,7 +1319,7 @@ export default function AdminProductsPage() {
                     }
                     className="w-4 h-4 text-[#FF5A00] accent-[#FF5A00] rounded"
                   />
-                  <span className="text-[11px] font-bold uppercase text-blue-400">
+                  <span className="text-[11px] font-bold uppercase text-blue-600">
                     New Arrival
                   </span>
                 </label>
@@ -1342,25 +1336,25 @@ export default function AdminProductsPage() {
                     }
                     className="w-4 h-4 text-[#FF5A00] accent-[#FF5A00] rounded"
                   />
-                  <span className="text-[11px] font-bold uppercase text-purple-400">
+                  <span className="text-[11px] font-bold uppercase text-purple-600">
                     Top Rated
                   </span>
                 </label>
               </div>
 
               {/* Submit Buttons */}
-              <div className="flex items-center justify-end gap-3 pt-4 border-t border-zinc-800">
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold uppercase text-zinc-400 hover:text-white"
+                  className="px-4 py-2 rounded-xl text-xs font-bold uppercase text-gray-600 hover:bg-gray-100 transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving || isImageUploading}
-                  className="px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider text-white bg-[#FF5A00] hover:bg-[#FF6A00] shadow-lg shadow-[#FF5A00]/30 transition-all disabled:opacity-50 flex items-center gap-2"
+                  className="px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider text-white bg-[#FF5A00] hover:bg-[#FF6A00] shadow-md shadow-[#FF5A00]/25 transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer"
                 >
                   {isSaving ? (
                     <>

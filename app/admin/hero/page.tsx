@@ -14,7 +14,6 @@ import {
   Smartphone,
   Monitor,
   Eye,
-  Layers,
 } from "lucide-react";
 
 export default function AdminHeroPage() {
@@ -39,7 +38,6 @@ export default function AdminHeroPage() {
 
       const dbSlides = (data || []) as any[];
 
-      // Always guarantee 3 Hero Slides
       const threeSlides: HeroSection[] = [
         {
           id: dbSlides[0]?.id || "slide-1",
@@ -202,24 +200,24 @@ export default function AdminHeroPage() {
   const currentSlide = slides[activeTab];
 
   return (
-    <div className="space-y-8 bg-black">
+    <div className="space-y-8 animate-in fade-in">
       <AdminHeader
-        title="3 Hero Banner Slides Management (Auto-Slide)"
-        subtitle="Manage up to 3 rotating hero banners with separate desktop and mobile creative uploads, custom action links, and auto-play carousel support"
+        title="Hero 3-Slide Auto Banner"
+        subtitle="Manage your 3 rotating hero banners with separate desktop and mobile creative uploads, custom action links, and auto-play carousel support"
       />
 
       {statusMsg && (
         <div
           className={`p-4 rounded-2xl border text-xs sm:text-sm font-semibold flex items-center gap-2.5 ${
             statusMsg.type === "success"
-              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-              : "bg-rose-500/10 border-rose-500/30 text-rose-400"
+              ? "bg-emerald-50 border-emerald-200 text-emerald-800"
+              : "bg-rose-50 border-rose-200 text-rose-800"
           }`}
         >
           {statusMsg.type === "success" ? (
-            <Check className="w-4 h-4 shrink-0" />
+            <Check className="w-4 h-4 shrink-0 text-emerald-600" />
           ) : (
-            <AlertCircle className="w-4 h-4 shrink-0" />
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
           )}
           <span>{statusMsg.text}</span>
         </div>
@@ -232,7 +230,7 @@ export default function AdminHeroPage() {
       ) : (
         <div className="space-y-8">
           {/* Slide Navigation Tabs */}
-          <div className="flex items-center gap-3 border-b border-zinc-800 pb-4 overflow-x-auto">
+          <div className="flex items-center gap-3 border-b border-gray-200/80 pb-4 overflow-x-auto">
             {slides.map((slide, idx) => {
               const hasImg = Boolean(slide.background_image_url);
               const isActiveTab = activeTab === idx;
@@ -244,22 +242,22 @@ export default function AdminHeroPage() {
                   onClick={() => setActiveTab(idx)}
                   className={`px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center gap-2.5 transition-all cursor-pointer ${
                     isActiveTab
-                      ? "bg-[#FF5A00] text-white shadow-lg shadow-[#FF5A00]/25"
-                      : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700"
+                      ? "bg-[#FF5A00] text-white shadow-md shadow-[#FF5A00]/25"
+                      : "bg-white border border-gray-200 text-gray-600 hover:text-gray-900 hover:border-gray-300"
                   }`}
                 >
                   <div
-                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${
+                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
                       isActiveTab
                         ? "bg-white text-[#FF5A00]"
-                        : "bg-zinc-800 text-zinc-400"
+                        : "bg-gray-100 text-gray-500"
                     }`}
                   >
                     {idx + 1}
                   </div>
                   <span>Slide {idx + 1}</span>
                   {hasImg && (
-                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
                   )}
                 </button>
               );
@@ -269,29 +267,28 @@ export default function AdminHeroPage() {
           {currentSlide && (
             <div className="space-y-8 animate-in fade-in">
               {/* Banner Uploaders */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Desktop Hero Banner */}
-                <div className="rounded-3xl bg-[#0A0A0A] border border-zinc-800/90 p-6 space-y-4 shadow-2xl flex flex-col justify-between">
+                <div className="rounded-2xl bg-white border border-gray-200/80 shadow-xs hover:shadow-md transition-shadow p-6 space-y-4 flex flex-col justify-between">
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-                      <div className="flex items-center gap-2 text-white">
+                    <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                      <div className="flex items-center gap-2 text-gray-900">
                         <Monitor className="w-4 h-4 text-[#FF5A00]" />
                         <h3 className="text-xs font-black uppercase tracking-wider">
                           Slide {activeTab + 1}: Desktop Hero Banner Image
                         </h3>
                       </div>
-                      <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                      <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">
                         Full Width (Zero Crop)
                       </span>
                     </div>
 
-                    <p className="text-xs text-zinc-400 leading-relaxed">
+                    <p className="text-xs text-gray-500 leading-relaxed">
                       Upload your designed desktop banner for Slide {activeTab + 1}. The storefront displays this banner with 100% natural width &amp; auto height without any cropping.
                     </p>
 
                     <ImageUploader
                       folder="hero"
-                      label=""
                       currentUrl={currentSlide.background_image_url}
                       onUploadSuccess={(url) =>
                         updateSlideField(activeTab, "background_image_url", url)
@@ -304,27 +301,26 @@ export default function AdminHeroPage() {
                 </div>
 
                 {/* Mobile Hero Banner */}
-                <div className="rounded-3xl bg-[#0A0A0A] border border-zinc-800/90 p-6 space-y-4 shadow-2xl flex flex-col justify-between">
+                <div className="rounded-2xl bg-white border border-gray-200/80 shadow-xs hover:shadow-md transition-shadow p-6 space-y-4 flex flex-col justify-between">
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-                      <div className="flex items-center gap-2 text-white">
+                    <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                      <div className="flex items-center gap-2 text-gray-900">
                         <Smartphone className="w-4 h-4 text-[#FF5A00]" />
                         <h3 className="text-xs font-black uppercase tracking-wider">
                           Slide {activeTab + 1}: Mobile Banner Image (Optional)
                         </h3>
                       </div>
-                      <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-zinc-800 text-zinc-300">
+                      <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-gray-100 text-gray-600">
                         Phone Optimized
                       </span>
                     </div>
 
-                    <p className="text-xs text-zinc-400 leading-relaxed">
+                    <p className="text-xs text-gray-500 leading-relaxed">
                       Optional dedicated mobile creative for Slide {activeTab + 1}. If left blank, the desktop banner will automatically scale down proportionally.
                     </p>
 
                     <ImageUploader
                       folder="hero"
-                      label=""
                       currentUrl={currentSlide.foreground_image_url}
                       onUploadSuccess={(url) =>
                         updateSlideField(activeTab, "foreground_image_url", url)
@@ -338,15 +334,15 @@ export default function AdminHeroPage() {
               </div>
 
               {/* Destination Settings */}
-              <div className="rounded-3xl bg-[#0A0A0A] border border-zinc-800/90 p-6 space-y-6 shadow-2xl">
-                <h3 className="text-xs font-black uppercase tracking-widest text-white border-l-2 border-[#FF5A00] pl-3">
+              <div className="rounded-2xl bg-white border border-gray-200/80 shadow-xs p-6 space-y-6">
+                <h3 className="text-xs font-black uppercase tracking-widest text-gray-900 border-l-2 border-[#FF5A00] pl-3">
                   Slide {activeTab + 1} Actions &amp; Destination Link
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {/* Title / Alt Tag */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
+                    <label className="text-xs font-bold uppercase tracking-wider text-gray-600">
                       Slide Name / Alt Text
                     </label>
                     <input
@@ -356,13 +352,13 @@ export default function AdminHeroPage() {
                         updateSlideField(activeTab, "heading_line_1", e.target.value)
                       }
                       placeholder={`Hero Slide ${activeTab + 1}`}
-                      className="w-full px-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white text-xs outline-none focus:border-[#FF5A00]"
+                      className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 text-xs outline-none focus:border-[#FF5A00] focus:bg-white transition-colors"
                     />
                   </div>
 
                   {/* Target URL */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-black uppercase tracking-wider text-zinc-400">
+                    <label className="text-xs font-bold uppercase tracking-wider text-gray-600">
                       Destination Link (Target URL)
                     </label>
                     <input
@@ -372,13 +368,13 @@ export default function AdminHeroPage() {
                         updateSlideField(activeTab, "primary_button_url", e.target.value)
                       }
                       placeholder="e.g. #shop-by-category, #featured-products, or URL"
-                      className="w-full px-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-white text-xs outline-none focus:border-[#FF5A00]"
+                      className="w-full px-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-900 text-xs outline-none focus:border-[#FF5A00] focus:bg-white transition-colors"
                     />
                   </div>
 
                   {/* Status Toggle */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-black uppercase tracking-wider text-zinc-400 block">
+                    <label className="text-xs font-bold uppercase tracking-wider text-gray-600 block">
                       Slide Status
                     </label>
                     <button
@@ -390,10 +386,10 @@ export default function AdminHeroPage() {
                           !(currentSlide.is_active ?? true)
                         )
                       }
-                      className={`w-full py-2.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider border transition-all ${
+                      className={`w-full py-2.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider border transition-all cursor-pointer ${
                         currentSlide.is_active ?? true
-                          ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
-                          : "bg-zinc-900 text-zinc-400 border-zinc-800"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                          : "bg-gray-100 text-gray-500 border-gray-200"
                       }`}
                     >
                       {currentSlide.is_active ?? true
@@ -406,15 +402,15 @@ export default function AdminHeroPage() {
 
               {/* Natural Live Preview */}
               {currentSlide.background_image_url && (
-                <div className="rounded-3xl bg-[#0A0A0A] border border-zinc-800/90 p-6 space-y-4 shadow-2xl">
-                  <div className="flex items-center gap-2 text-white">
+                <div className="rounded-2xl bg-white border border-gray-200/80 shadow-xs p-6 space-y-4">
+                  <div className="flex items-center gap-2 text-gray-900">
                     <Eye className="w-4 h-4 text-[#FF5A00]" />
                     <h3 className="text-xs font-black uppercase tracking-widest">
                       Live Natural Aspect Ratio Preview (Slide {activeTab + 1})
                     </h3>
                   </div>
 
-                  <div className="w-full rounded-2xl overflow-hidden border border-zinc-800 bg-black">
+                  <div className="w-full rounded-2xl overflow-hidden border border-gray-200 bg-black">
                     <img
                       src={currentSlide.background_image_url}
                       alt={`Slide ${activeTab + 1} Preview`}
@@ -425,8 +421,8 @@ export default function AdminHeroPage() {
               )}
 
               {/* Save Slide Action */}
-              <div className="sticky bottom-6 z-30 p-4 rounded-2xl bg-black/90 backdrop-blur-md border border-zinc-800 flex items-center justify-between shadow-2xl">
-                <div className="flex items-center gap-2 text-xs font-bold text-zinc-400">
+              <div className="sticky bottom-6 z-30 p-4 rounded-2xl bg-white/95 backdrop-blur-md border border-gray-200 shadow-xl flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs font-bold text-gray-600">
                   <Sparkles className="w-4 h-4 text-[#FF5A00]" />
                   <span>Saves to 3-Slide Auto-Rotating Carousel</span>
                 </div>

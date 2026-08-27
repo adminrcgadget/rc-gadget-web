@@ -21,13 +21,13 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col lg:flex-row">
+    <div className="min-h-screen bg-[#F8F9FB] text-gray-900 flex flex-col lg:flex-row antialiased selection:bg-[#FF5A00] selection:text-white">
       {/* Mobile Top Navigation Bar */}
-      <div className="lg:hidden h-16 bg-black border-b border-zinc-800/90 px-4 flex items-center justify-between sticky top-0 z-40">
+      <div className="lg:hidden h-16 bg-[#0D0D10] border-b border-[#1C1C22] px-4 flex items-center justify-between sticky top-0 z-40">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setMobileSidebarOpen(true)}
-            className="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-white hover:text-[#FF5A00] transition-colors"
+            className="p-2 rounded-xl bg-[#1A1A20] border border-white/10 text-white hover:text-[#FF5A00] transition-colors"
             aria-label="Open menu"
           >
             <Menu className="w-5 h-5" />
@@ -47,21 +47,21 @@ export default function AdminLayout({
         <Link
           href="/"
           target="_blank"
-          className="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-[#FF5A00] text-xs font-bold flex items-center gap-1"
+          className="p-2 rounded-xl bg-[#1A1A20] border border-white/10 text-[#FF5A00] text-xs font-bold flex items-center gap-1"
         >
           <ExternalLink className="w-4 h-4" />
         </Link>
       </div>
 
-      {/* Sidebar Navigation */}
+      {/* Left Sidebar Navigation */}
       <AdminSidebar
         isOpen={mobileSidebarOpen}
         onClose={() => setMobileSidebarOpen(false)}
       />
 
-      {/* Main Content Area */}
-      <div className="flex-1 lg:pl-64 flex flex-col min-h-screen bg-black">
-        <main className="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto bg-black">
+      {/* Main Content Dashboard Canvas (Clean Modern White Layout) */}
+      <div className="flex-1 lg:pl-64 flex flex-col min-h-screen">
+        <main className="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto">
           {children}
         </main>
       </div>
