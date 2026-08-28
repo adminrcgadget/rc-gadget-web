@@ -29,100 +29,11 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { addToCart, toggleWishlist, isInWishlist, searchQuery } = useStore();
 
-  const defaultProducts: StoreProduct[] = [
-    {
-      id: "p-1",
-      title: "Traxxas X-Maxx 8S 4WD Brushless Monster Truck",
-      category_name: "RC Cars",
-      brand_name: "Traxxas",
-      price: 79999,
-      original_price: 89999,
-      rating: 4.9,
-      reviews_count: 128,
-      badge: "HOT",
-      image_url: null,
-      is_bestseller: true,
-      is_new_arrival: false,
-      is_top_rated: true,
-    },
-    {
-      id: "p-2",
-      title: "DJI Mini 4 Pro Drone with RC-N2 Controller",
-      category_name: "RC Drones",
-      brand_name: "DJI",
-      price: 84990,
-      original_price: 92000,
-      rating: 4.9,
-      reviews_count: 96,
-      badge: "NEW",
-      image_url: null,
-      is_bestseller: true,
-      is_new_arrival: true,
-      is_top_rated: true,
-    },
-    {
-      id: "p-3",
-      title: "FMS 1400mm P-51D Mustang V8 RC Plane",
-      category_name: "RC Planes",
-      brand_name: "FMS",
-      price: 32999,
-      original_price: 38000,
-      rating: 4.8,
-      reviews_count: 74,
-      badge: "POPULAR",
-      image_url: null,
-      is_bestseller: true,
-      is_new_arrival: false,
-      is_top_rated: true,
-    },
-    {
-      id: "p-4",
-      title: "Traxxas Rustler 4x4 VXL Brushless RC Car",
-      category_name: "RC Cars",
-      brand_name: "Traxxas",
-      price: 29999,
-      original_price: 34500,
-      rating: 4.8,
-      reviews_count: 89,
-      badge: "SALE",
-      image_url: null,
-      is_bestseller: true,
-      is_new_arrival: false,
-      is_top_rated: false,
-    },
-    {
-      id: "p-5",
-      title: "Volantex RC Vector SR80 Brushless RC Boat",
-      category_name: "RC Boats",
-      brand_name: "Volantex",
-      price: 23999,
-      original_price: 27999,
-      rating: 4.9,
-      reviews_count: 64,
-      badge: "HOT",
-      image_url: null,
-      is_bestseller: true,
-      is_new_arrival: false,
-      is_top_rated: true,
-    },
-    {
-      id: "p-6",
-      title: "FlySky FS-GT5 6CH Transmitter & Receiver",
-      category_name: "Accessories",
-      brand_name: "FlySky",
-      price: 6499,
-      original_price: 7999,
-      rating: 4.8,
-      reviews_count: 112,
-      badge: "BEST",
-      image_url: null,
-      is_bestseller: true,
-      is_new_arrival: false,
-      is_top_rated: true,
-    },
-  ];
+  const allItems = products && products.length > 0 ? products : [];
 
-  const allItems = products && products.length > 0 ? products : defaultProducts;
+  if (allItems.length === 0) {
+    return null;
+  }
 
   const filtered = allItems.filter((item) => {
     if (
@@ -278,7 +189,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                 {/* Clickable Image & Title */}
                 <Link href={`/products/${product.id}`} className="block">
                   {/* Image */}
-                  <div className="relative w-full h-28 rounded-xl overflow-hidden bg-gray-50 flex items-center justify-center mb-2.5">
+                  <div className="relative w-full h-28 rounded-xl overflow-hidden bg-white border border-gray-100/90 flex items-center justify-center mb-2.5">
                     {hasImg ? (
                       <Image
                         src={product.image_url!}
@@ -387,7 +298,7 @@ export const FeaturedProducts: React.FC<FeaturedProductsProps> = ({
                   {/* Clickable Image & Title */}
                   <Link href={`/products/${product.id}`} className="block">
                     {/* Image */}
-                    <div className="relative w-full h-36 sm:h-40 rounded-2xl overflow-hidden bg-gray-50/70 flex items-center justify-center p-2 mb-3">
+                    <div className="relative w-full h-36 sm:h-40 rounded-2xl overflow-hidden bg-white border border-gray-100/90 flex items-center justify-center p-2 mb-3">
                       {hasImg ? (
                         <Image
                           src={product.image_url!}

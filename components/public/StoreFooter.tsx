@@ -266,16 +266,32 @@ export const StoreFooter: React.FC<StoreFooterProps> = ({
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-6 border-t border-zinc-900 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-600">
-          <p>© 2026 RC Gadgets Kottakkal. All Rights Reserved.</p>
+        <div className="pt-6 border-t border-zinc-900 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-500">
+          <div className="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-2 text-center sm:text-left">
+            <p>© 2026 RC Gadgets Kottakkal. All Rights Reserved.</p>
+            <span className="hidden sm:inline text-zinc-700">•</span>
+            <p className="text-zinc-500">
+              Crafted by{" "}
+              <a
+                href="https://ekodrix.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-zinc-300 hover:text-[#FF5A00] font-semibold transition-colors underline decoration-zinc-800 hover:decoration-[#FF5A00] underline-offset-2"
+              >
+                Ekodrix
+              </a>
+            </p>
+          </div>
+
           <div className="flex items-center gap-4">
-            <span className="text-[11px] text-zinc-500 font-semibold">
+            <span className="text-[11px] text-zinc-500 font-semibold hidden md:inline">
               First in Malappuram • Professional RC Hub
             </span>
             <button
               onClick={scrollToTop}
               className="w-8 h-8 rounded-full border border-zinc-800 hover:border-[#FF5A00] text-zinc-400 hover:text-[#FF5A00] flex items-center justify-center transition-colors"
               aria-label="Scroll to top"
+              title="Scroll to top"
             >
               <ArrowUp className="w-4 h-4" />
             </button>

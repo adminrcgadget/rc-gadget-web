@@ -13,6 +13,8 @@ export interface StoreProduct {
   reviews_count: number;
   badge?: string | null;
   image_url?: string | null;
+  gallery_images?: string[] | null;
+  video_url?: string | null;
   is_bestseller?: boolean;
   is_new_arrival?: boolean;
   is_top_rated?: boolean;

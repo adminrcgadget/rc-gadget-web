@@ -2,7 +2,7 @@
 
 @layer base {
   :root {
-    --bg-main: #FAFAFA;
+    --bg-main: #FFFFFF;
     --bg-secondary: #FFFFFF;
     --bg-card: #FFFFFF;
     --bg-card-hover: #F4F5F7;
@@ -18,14 +18,18 @@
   html {
     scroll-behavior: smooth;
     color-scheme: light;
-    background-color: #FAFAFA;
+    background-color: #FFFFFF;
   }
 
   body {
-    background-color: #FAFAFA;
+    background-color: #FFFFFF;
     color: #111111;
     overflow-x: hidden;
-    selection-background-color: #FF5A00;
+    font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.01em;
+    selection-background-color: #111111;
     selection-color: #FFFFFF;
   }
 }

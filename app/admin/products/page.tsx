@@ -26,136 +26,12 @@ import {
   Sparkles,
   TrendingUp,
   Award,
+  Video,
+  Film,
+  Play,
+  Image as ImageIcon,
+  PlusCircle,
 } from "lucide-react";
-
-const FALLBACK_PRODUCTS: Product[] = [
-  {
-    id: "p-1",
-    title: "Traxxas X-Maxx 8S 4WD Brushless Monster Truck",
-    category_name: "RC Cars",
-    brand_name: "Traxxas",
-    price: 79999,
-    original_price: 89999,
-    rating: 4.9,
-    reviews_count: 128,
-    badge: "HOT",
-    image_url: "https://res.cloudinary.com/r28lk4ms/image/upload/v1787045166/rc-gadgets/assets/cat-car.webp",
-    description: "Unstoppable 8S power, mammoth size, and award-winning durability.",
-    stock_quantity: 5,
-    is_bestseller: true,
-    is_new_arrival: false,
-    is_top_rated: true,
-    is_active: true,
-    sort_order: 1,
-    created_at: "",
-    updated_at: "",
-  },
-  {
-    id: "p-2",
-    title: "DJI Mini 4 Pro Drone with RC-N2 Controller",
-    category_name: "RC Drones",
-    brand_name: "DJI",
-    price: 84990,
-    original_price: 92000,
-    rating: 4.9,
-    reviews_count: 96,
-    badge: "NEW",
-    image_url: null,
-    description: "Omnidirectional obstacle sensing, 4K/60fps HDR video, and 34-min flight time.",
-    stock_quantity: 8,
-    is_bestseller: true,
-    is_new_arrival: true,
-    is_top_rated: true,
-    is_active: true,
-    sort_order: 2,
-    created_at: "",
-    updated_at: "",
-  },
-  {
-    id: "p-3",
-    title: "FMS 1400mm P-51D Mustang V8 RC Plane",
-    category_name: "RC Planes",
-    brand_name: "FMS",
-    price: 32999,
-    original_price: 38000,
-    rating: 4.8,
-    reviews_count: 74,
-    badge: "POPULAR",
-    image_url: "https://res.cloudinary.com/r28lk4ms/image/upload/v1787045169/rc-gadgets/assets/cat-plane.webp",
-    description: "Scale detail, functional flaps, retractable landing gear, and high-speed brushless power.",
-    stock_quantity: 4,
-    is_bestseller: true,
-    is_new_arrival: false,
-    is_top_rated: true,
-    is_active: true,
-    sort_order: 3,
-    created_at: "",
-    updated_at: "",
-  },
-  {
-    id: "p-4",
-    title: "Traxxas Rustler 4x4 VXL Brushless RC Car",
-    category_name: "RC Cars",
-    brand_name: "Traxxas",
-    price: 29999,
-    original_price: 34500,
-    rating: 4.8,
-    reviews_count: 89,
-    badge: "SALE",
-    image_url: "https://res.cloudinary.com/r28lk4ms/image/upload/v1787045166/rc-gadgets/assets/cat-car.webp",
-    description: "65+ mph stadium truck performance with Velineon brushless power.",
-    stock_quantity: 12,
-    is_bestseller: true,
-    is_new_arrival: false,
-    is_top_rated: false,
-    is_active: true,
-    sort_order: 4,
-    created_at: "",
-    updated_at: "",
-  },
-  {
-    id: "p-5",
-    title: "Volantex RC Vector SR80 Brushless RC Boat",
-    category_name: "RC Boats",
-    brand_name: "Volantex",
-    price: 23999,
-    original_price: 27999,
-    rating: 4.9,
-    reviews_count: 64,
-    badge: "HOT",
-    image_url: "https://res.cloudinary.com/r28lk4ms/image/upload/v1787045170/rc-gadgets/assets/cat-ship.webp",
-    description: "Auto-roll back function, water-cooled brushless motor hitting speeds over 70 km/h.",
-    stock_quantity: 6,
-    is_bestseller: true,
-    is_new_arrival: false,
-    is_top_rated: true,
-    is_active: true,
-    sort_order: 5,
-    created_at: "",
-    updated_at: "",
-  },
-  {
-    id: "p-6",
-    title: "FlySky FS-GT5 6CH Transmitter & Receiver",
-    category_name: "Accessories",
-    brand_name: "FlySky",
-    price: 6499,
-    original_price: 7999,
-    rating: 4.8,
-    reviews_count: 112,
-    badge: "BEST",
-    image_url: "https://res.cloudinary.com/r28lk4ms/image/upload/v1787045168/rc-gadgets/assets/cat-gadget.webp",
-    description: "6-channel ultra-fast AFHDS 2A protocol with built-in gyro receiver (FS-BS6).",
-    stock_quantity: 20,
-    is_bestseller: true,
-    is_new_arrival: false,
-    is_top_rated: true,
-    is_active: true,
-    sort_order: 6,
-    created_at: "",
-    updated_at: "",
-  },
-];
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -180,6 +56,16 @@ export default function AdminProductsPage() {
   );
   const [isSaving, setIsSaving] = useState(false);
   const [isImageUploading, setIsImageUploading] = useState(false);
+
+  // Gallery and Video upload state
+  const [isGalleryUploading, setIsGalleryUploading] = useState(false);
+  const [isVideoUploading, setIsVideoUploading] = useState(false);
+  const [galleryUploadError, setGalleryUploadError] = useState<string | null>(null);
+  const [videoUploadError, setVideoUploadError] = useState<string | null>(null);
+  const [customGalleryUrl, setCustomGalleryUrl] = useState("");
+  const [customVideoUrl, setCustomVideoUrl] = useState("");
+  const galleryFileInputRef = useRef<HTMLInputElement>(null);
+  const videoFileInputRef = useRef<HTMLInputElement>(null);
 
   // Direct card upload state
   const [uploadingCardId, setUploadingCardId] = useState<string | null>(null);
@@ -214,16 +100,15 @@ export default function AdminProductsPage() {
       if (productsRes.data && productsRes.data.length > 0) {
         setProducts(productsRes.data as Product[]);
       } else {
-        setProducts(FALLBACK_PRODUCTS);
+        setProducts([]);
       }
     } catch (err) {
       console.error("Error fetching admin products:", err);
-      setProducts(FALLBACK_PRODUCTS);
+      setProducts([]);
     } finally {
       setIsLoading(false);
     }
   };
-
 
   useEffect(() => {
     fetchInitialData();
@@ -240,6 +125,8 @@ export default function AdminProductsPage() {
       reviews_count: 0,
       badge: "NEW",
       image_url: null,
+      gallery_images: [],
+      video_url: null,
       description: "",
       stock_quantity: 10,
       is_bestseller: false,
@@ -248,12 +135,126 @@ export default function AdminProductsPage() {
       is_active: true,
       sort_order: (products.length + 1) * 1,
     });
+    setGalleryUploadError(null);
+    setVideoUploadError(null);
+    setCustomGalleryUrl("");
+    setCustomVideoUrl("");
     setIsModalOpen(true);
   };
 
   const handleOpenEdit = (product: Product) => {
-    setEditingProduct({ ...product });
+    setEditingProduct({
+      ...product,
+      gallery_images: product.gallery_images || [],
+      video_url: product.video_url || null,
+    });
+    setGalleryUploadError(null);
+    setVideoUploadError(null);
+    setCustomGalleryUrl("");
+    setCustomVideoUrl("");
     setIsModalOpen(true);
+  };
+
+  // Gallery multi-upload handler
+  const handleGalleryFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    setIsGalleryUploading(true);
+    setGalleryUploadError(null);
+
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (file.size > 12 * 1024 * 1024) {
+          throw new Error(`File '${file.name}' exceeds 12MB limit.`);
+        }
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("folder", "products");
+
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+        const result = await response.json();
+        if (!response.ok || !result.url) {
+          throw new Error(result.error || `Failed to upload '${file.name}'`);
+        }
+
+        setEditingProduct((prev) => {
+          if (!prev) return null;
+          const current = prev.gallery_images || [];
+          return { ...prev, gallery_images: [...current, result.url] };
+        });
+      }
+    } catch (err: any) {
+      setGalleryUploadError(err.message || "Failed to upload gallery image");
+    } finally {
+      setIsGalleryUploading(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleRemoveGalleryImage = (indexToRemove: number) => {
+    setEditingProduct((prev) => {
+      if (!prev) return null;
+      const current = prev.gallery_images || [];
+      return {
+        ...prev,
+        gallery_images: current.filter((_, idx) => idx !== indexToRemove),
+      };
+    });
+  };
+
+  const handleAddCustomGalleryUrl = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customGalleryUrl.trim()) return;
+    setEditingProduct((prev) => {
+      if (!prev) return null;
+      const current = prev.gallery_images || [];
+      return { ...prev, gallery_images: [...current, customGalleryUrl.trim()] };
+    });
+    setCustomGalleryUrl("");
+  };
+
+  // Video upload handler with size validation & auto compression
+  const handleVideoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsVideoUploading(true);
+    setVideoUploadError(null);
+
+    // Max 40MB
+    if (file.size > 40 * 1024 * 1024) {
+      setVideoUploadError(
+        `Video size (${(file.size / (1024 * 1024)).toFixed(1)}MB) exceeds 40MB limit.`
+      );
+      setIsVideoUploading(false);
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "products/videos");
+      formData.append("resource_type", "video");
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await response.json();
+      if (!response.ok || !result.url) {
+        throw new Error(result.error || "Failed to upload video");
+      }
+
+      setEditingProduct((prev) => (prev ? { ...prev, video_url: result.url } : null));
+    } catch (err: any) {
+      setVideoUploadError(err.message || "Video upload failed");
+    } finally {
+      setIsVideoUploading(false);
+      e.target.value = "";
+    }
   };
 
   const extractErrorMessage = (err: any): string => {
@@ -313,11 +314,13 @@ export default function AdminProductsPage() {
 
       const newImageUrl = result.url;
 
-      // Update Supabase DB directly if it's a UUID
+      // Update Supabase DB directly
       const isUuid =
         /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
           product.id
         );
+
+      let realId = product.id;
 
       if (isUuid) {
         const { error: dbError } = await (supabase.from("products") as any)
@@ -328,12 +331,44 @@ export default function AdminProductsPage() {
           .eq("id", product.id);
 
         if (dbError) throw dbError;
+      } else {
+        // Fallback product was edited -> Insert permanently into Supabase
+        const payload: any = {
+          title: product.title,
+          category_name: product.category_name || "RC Cars",
+          brand_name: product.brand_name || "RC GADGETS",
+          price: Number(product.price) || 0,
+          original_price: product.original_price ? Number(product.original_price) : null,
+          rating: Number(product.rating) || 5.0,
+          reviews_count: Number(product.reviews_count) || 0,
+          badge: product.badge || null,
+          image_url: newImageUrl,
+          gallery_images: product.gallery_images && product.gallery_images.length > 0 ? product.gallery_images : [newImageUrl],
+          video_url: product.video_url || null,
+          description: product.description || "",
+          stock_quantity: Number(product.stock_quantity) || 10,
+          is_bestseller: Boolean(product.is_bestseller),
+          is_new_arrival: Boolean(product.is_new_arrival),
+          is_top_rated: Boolean(product.is_top_rated),
+          is_active: product.is_active ?? true,
+          sort_order: Number(product.sort_order) || 1,
+        };
+
+        const { data: inserted, error: dbError } = await (supabase.from("products") as any)
+          .insert(payload)
+          .select()
+          .single();
+
+        if (dbError) throw dbError;
+        if (inserted?.id) {
+          realId = inserted.id;
+        }
       }
 
       // Update local state immediately
       setProducts((prev) =>
         prev.map((p) =>
-          p.id === product.id ? { ...p, image_url: newImageUrl } : p
+          p.id === product.id ? { ...p, id: realId, image_url: newImageUrl } : p
         )
       );
 
@@ -373,6 +408,8 @@ export default function AdminProductsPage() {
         reviews_count: Number(editingProduct.reviews_count) || 0,
         badge: editingProduct.badge || null,
         image_url: editingProduct.image_url || null,
+        gallery_images: editingProduct.gallery_images || [],
+        video_url: editingProduct.video_url || null,
         description: editingProduct.description || "",
         stock_quantity: Number(editingProduct.stock_quantity) || 10,
         is_bestseller: Boolean(editingProduct.is_bestseller),
@@ -1171,10 +1208,10 @@ export default function AdminProductsPage() {
                 )}
               </div>
 
-              {/* Product Photo Upload */}
+              {/* 1. Primary Product Photo */}
               <div className="space-y-2 pt-2 border-t border-gray-100">
                 <ImageUploader
-                  label="Product Photo"
+                  label="Primary Product Photo (Main Thumbnail)"
                   bucket="products"
                   folder="products"
                   currentUrl={editingProduct.image_url}
@@ -1192,6 +1229,230 @@ export default function AdminProductsPage() {
                     )
                   }
                 />
+              </div>
+
+              {/* 2. Additional Gallery Photos */}
+              <div className="space-y-3 pt-3 border-t border-gray-100">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold uppercase tracking-wider text-gray-700 flex items-center gap-1.5">
+                    <ImageIcon className="w-3.5 h-3.5 text-[#FF5A00]" />
+                    <span>Additional Gallery Photos</span>
+                    <span className="text-[10px] text-gray-400 font-normal">
+                      ({editingProduct.gallery_images?.length || 0} photos)
+                    </span>
+                  </label>
+
+                  <button
+                    type="button"
+                    onClick={() => galleryFileInputRef.current?.click()}
+                    disabled={isGalleryUploading}
+                    className="px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-[#FF5A00] hover:text-white text-gray-700 text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  >
+                    {isGalleryUploading ? (
+                      <>
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        <span>Uploading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-3 h-3" />
+                        <span>Upload Photos</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <input
+                  ref={galleryFileInputRef}
+                  type="file"
+                  multiple
+                  accept="image/jpeg,image/png,image/webp,image/jpg"
+                  onChange={handleGalleryFiles}
+                  className="hidden"
+                />
+
+                {galleryUploadError && (
+                  <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs font-semibold flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>{galleryUploadError}</span>
+                  </div>
+                )}
+
+                {/* Gallery Thumbnails List */}
+                {editingProduct.gallery_images && editingProduct.gallery_images.length > 0 ? (
+                  <div className="grid grid-cols-4 sm:grid-cols-6 gap-2.5 p-3 rounded-2xl bg-gray-50 border border-gray-200">
+                    {editingProduct.gallery_images.map((imgUrl, idx) => (
+                      <div
+                        key={idx}
+                        className="relative group aspect-square rounded-xl bg-white border border-gray-200 overflow-hidden shadow-xs"
+                      >
+                        <Image
+                          src={imgUrl}
+                          alt={`Gallery photo ${idx + 1}`}
+                          fill
+                          sizes="100px"
+                          className="object-contain p-1"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveGalleryImage(idx)}
+                          className="absolute top-1 right-1 p-1 rounded-full bg-rose-600 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-700 shadow-xs cursor-pointer"
+                          title="Remove this photo"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-gray-400 italic">
+                    No extra gallery photos uploaded yet. Click &quot;Upload Photos&quot; or paste a photo link below.
+                  </p>
+                )}
+
+                {/* Optional: Paste Image URL */}
+                <div className="flex gap-2">
+                  <input
+                    type="url"
+                    placeholder="or paste image URL (https://...)"
+                    value={customGalleryUrl}
+                    onChange={(e) => setCustomGalleryUrl(e.target.value)}
+                    className="flex-1 px-3 py-1.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-[#FF5A00] focus:bg-white text-gray-900 text-xs outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCustomGalleryUrl}
+                    className="px-3 py-1.5 rounded-xl bg-gray-900 hover:bg-black text-white text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    Add URL
+                  </button>
+                </div>
+              </div>
+
+              {/* 3. Product Video (Auto-Compressed Upload + Stream Preview) */}
+              <div className="space-y-3 pt-3 border-t border-gray-100">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold uppercase tracking-wider text-gray-700 flex items-center gap-1.5">
+                    <Video className="w-3.5 h-3.5 text-[#FF5A00]" />
+                    <span>Product Video (Optional)</span>
+                    {editingProduct.video_url && (
+                      <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-700 uppercase">
+                        Video Attached
+                      </span>
+                    )}
+                  </label>
+
+                  <button
+                    type="button"
+                    onClick={() => videoFileInputRef.current?.click()}
+                    disabled={isVideoUploading}
+                    className="px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-[#FF5A00] hover:text-white text-gray-700 text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  >
+                    {isVideoUploading ? (
+                      <>
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                        <span>Compressing &amp; Uploading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Film className="w-3 h-3" />
+                        <span>Upload Video (Max 40MB)</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <input
+                  ref={videoFileInputRef}
+                  type="file"
+                  accept="video/mp4,video/webm,video/quicktime,video/mov"
+                  onChange={handleVideoFile}
+                  className="hidden"
+                />
+
+                {videoUploadError && (
+                  <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 text-xs font-semibold flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>{videoUploadError}</span>
+                  </div>
+                )}
+
+                {/* Video Preview Player if attached */}
+                {editingProduct.video_url ? (
+                  <div className="relative w-full rounded-2xl bg-black border border-gray-200 overflow-hidden shadow-xs group/vid p-2">
+                    {editingProduct.video_url.includes("youtube.com") ||
+                    editingProduct.video_url.includes("youtu.be") ? (
+                      <div className="aspect-video w-full">
+                        <iframe
+                          src={
+                            editingProduct.video_url.includes("youtu.be/")
+                              ? `https://www.youtube-nocookie.com/embed/${editingProduct.video_url.split("youtu.be/")[1]?.split("?")[0]}`
+                              : `https://www.youtube-nocookie.com/embed/${editingProduct.video_url.match(/[?&]v=([^&]+)/)?.[1] || ""}`
+                          }
+                          title="Video Preview"
+                          className="w-full h-full rounded-xl border-0"
+                          allowFullScreen
+                        />
+                      </div>
+                    ) : (
+                      <video
+                        src={editingProduct.video_url}
+                        controls
+                        playsInline
+                        className="w-full max-h-56 rounded-xl object-contain bg-black"
+                      />
+                    )}
+
+                    <div className="flex items-center justify-between pt-2 px-1 text-xs">
+                      <span className="text-gray-300 truncate max-w-xs text-[11px]">
+                        {editingProduct.video_url}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setEditingProduct((prev) =>
+                            prev ? { ...prev, video_url: null } : null
+                          )
+                        }
+                        className="px-2.5 py-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-[11px] font-bold transition-colors cursor-pointer shrink-0 flex items-center gap-1"
+                      >
+                        <X className="w-3 h-3" />
+                        <span>Remove Video</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    <p className="text-[11px] text-gray-400">
+                      Upload an MP4/WebM video (auto-compressed on upload) or paste a YouTube / CDN video link below:
+                    </p>
+                    <div className="flex gap-2">
+                      <input
+                        type="url"
+                        placeholder="https://youtube.com/watch?v=... or direct .mp4 link"
+                        value={customVideoUrl}
+                        onChange={(e) => setCustomVideoUrl(e.target.value)}
+                        className="flex-1 px-3 py-1.5 rounded-xl bg-gray-50 border border-gray-200 focus:border-[#FF5A00] focus:bg-white text-gray-900 text-xs outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (!customVideoUrl.trim()) return;
+                          setEditingProduct((prev) =>
+                            prev
+                              ? { ...prev, video_url: customVideoUrl.trim() }
+                              : null
+                          );
+                          setCustomVideoUrl("");
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-gray-900 hover:bg-black text-white text-xs font-bold transition-colors cursor-pointer"
+                      >
+                        Set Video URL
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Description */}

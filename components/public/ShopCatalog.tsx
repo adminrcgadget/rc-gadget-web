@@ -483,7 +483,7 @@ function ShopCatalogContent({
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 gap-5 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {filteredProducts.map((product) => {
                 const isWish = isInWishlist(product.id);
                 const isAdded = addedIds.includes(product.id);
@@ -500,29 +500,29 @@ function ShopCatalogContent({
                 return (
                   <div
                     key={product.id}
-                    className="group relative flex flex-col justify-between transition-all duration-300"
+                    className="group relative flex flex-col justify-between bg-white border border-gray-200/90 hover:border-gray-300 transition-all duration-300 p-3 sm:p-4 shadow-xs hover:shadow-sm"
                   >
                     <div>
-                      {/* Photo Box (Apple / Nike Standard) */}
-                      <div className="relative w-full aspect-square rounded-2xl bg-[#F6F6F6] flex items-center justify-center p-6 mb-3.5 overflow-hidden">
-                        {/* Minimal Badge */}
+                      {/* Photo Box (Clean Unified White Canvas) */}
+                      <div className="relative w-full aspect-square bg-white flex items-center justify-center p-2 mb-3 overflow-hidden">
+                        {/* Minimal Badge — Z-INDEX 20 so it never gets covered */}
                         {product.badge ? (
-                          <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-black text-white">
+                          <span className="absolute top-2 left-2 z-20 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider bg-black text-white shadow-xs pointer-events-none">
                             {product.badge}
                           </span>
                         ) : discount ? (
-                          <span className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-emerald-600 text-white">
+                          <span className="absolute top-2 left-2 z-20 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider bg-emerald-600 text-white shadow-xs pointer-events-none">
                             {discount}% OFF
                           </span>
                         ) : null}
 
-                        {/* Minimal Wishlist Heart */}
+                        {/* Minimal Wishlist Heart — Z-INDEX 20 */}
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             toggleWishlist(product as any);
                           }}
-                          className={`absolute top-3 right-3 p-1.5 rounded-full bg-white/80 backdrop-blur-xs transition-colors cursor-pointer ${
+                          className={`absolute top-2 right-2 z-20 p-2 rounded-full bg-white/90 shadow-xs hover:bg-white transition-all cursor-pointer ${
                             isWish
                               ? "text-rose-500"
                               : "text-gray-400 hover:text-black"
@@ -543,14 +543,14 @@ function ShopCatalogContent({
                         {/* Image Link */}
                         <Link
                           href={`/products/${product.id}`}
-                          className="relative w-full h-full block"
+                          className="relative w-full h-full block z-10"
                         >
                           {hasImg ? (
                             <Image
                               src={product.image_url!}
                               alt={product.title}
                               fill
-                              sizes="(max-width: 640px) 160px, (max-width: 1024px) 240px, 320px"
+                              sizes="(max-width: 640px) 280px, (max-width: 1024px) 320px, 360px"
                               className="object-contain p-2 transition-transform duration-500 group-hover:scale-105"
                             />
                           ) : (
@@ -562,7 +562,7 @@ function ShopCatalogContent({
                       </div>
 
                       {/* Brand & Category */}
-                      <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-gray-500 mb-1">
+                      <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1">
                         <span className="text-[#FF5A00]">
                           {product.brand_name || "RC GADGETS"}
                         </span>
@@ -573,21 +573,21 @@ function ShopCatalogContent({
 
                       {/* Title */}
                       <Link href={`/products/${product.id}`} className="block mb-2">
-                        <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 leading-snug group-hover:text-black transition-colors">
+                        <h3 className="text-xs sm:text-sm font-bold text-gray-900 line-clamp-2 leading-snug group-hover:text-[#FF5A00] transition-colors">
                           {product.title}
                         </h3>
                       </Link>
                     </div>
 
                     {/* Bottom Row: Price & Minimal Add to Bag */}
-                    <div className="pt-2 flex items-baseline justify-between gap-2 border-t border-gray-100">
+                    <div className="pt-2.5 flex items-end justify-between gap-2 border-t border-gray-100 mt-2">
                       <div>
                         <div className="flex items-baseline gap-1.5 flex-wrap">
-                          <span className="text-base font-bold text-gray-900">
+                          <span className="text-sm sm:text-base font-extrabold text-gray-900">
                             ₹{Number(product.price).toLocaleString("en-IN")}
                           </span>
                           {product.original_price && (
-                            <span className="text-xs text-gray-400 line-through">
+                            <span className="text-[11px] text-gray-400 line-through">
                               ₹
                               {Number(product.original_price).toLocaleString(
                                 "en-IN"
@@ -596,7 +596,7 @@ function ShopCatalogContent({
                           )}
                         </div>
                         {product.rating && (
-                          <span className="text-[11px] text-gray-500 font-medium block">
+                          <span className="text-[10px] text-gray-500 font-semibold block mt-0.5">
                             ★ {product.rating} ({product.reviews_count || 24})
                           </span>
                         )}
@@ -604,10 +604,10 @@ function ShopCatalogContent({
 
                       <button
                         onClick={(e) => handleAddToCart(product, e)}
-                        className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer shrink-0 ${
+                        className={`px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer shrink-0 ${
                           isAdded
                             ? "bg-emerald-600 text-white"
-                            : "bg-black hover:bg-zinc-800 text-white active:scale-95"
+                            : "bg-black hover:bg-[#FF5A00] text-white active:scale-95"
                         }`}
                       >
                         {isAdded ? "Added" : "Add to Bag"}

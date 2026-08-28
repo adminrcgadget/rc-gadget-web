@@ -147,6 +147,8 @@ export interface Product {
   reviews_count: number;
   badge?: string | null;
   image_url?: string | null;
+  gallery_images?: string[] | null;
+  video_url?: string | null;
   description?: string | null;
   stock_quantity?: number;
   is_bestseller?: boolean;

@@ -1,25 +1,82 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { SiteSettings, NavigationItem } from "@/types/database";
 import { useStore } from "@/components/context/StoreContext";
-import { Menu, X, ArrowRight, Phone, ShoppingBag } from "lucide-react";
+import {
+  Menu,
+  X,
+  ArrowRight,
+  Phone,
+  ShoppingBag,
+  ChevronDown,
+  Sparkles,
+} from "lucide-react";
 
 interface HeaderProps {
   settings: SiteSettings;
-  navigation: NavigationItem[];
+  navigation?: NavigationItem[];
 }
 
-export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
+interface NavLinkItem {
+  id: string;
+  label: string;
+  href: string;
+  hasDropdown?: boolean;
+  dropdownItems?: { label: string; href: string; badge?: string }[];
+}
+
+export const Header: React.FC<HeaderProps> = ({ settings }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeHref, setActiveHref] = useState("#hero");
+  const [openMobileDropdown, setOpenMobileDropdown] = useState<string | null>(null);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [activeHref, setActiveHref] = useState("");
   const pathname = usePathname();
   const isHomePage = pathname === "/";
   const { cartCount, setIsCartOpen } = useStore();
+  const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Essential links:
+  // Shop | RC Cars ⌄ | RC Accessories | Hotwheels | Contact
+  const navItems: NavLinkItem[] = [
+    {
+      id: "nav-shop",
+      label: "Shop",
+      href: "/shop",
+    },
+    {
+      id: "nav-rc-cars",
+      label: "RC Cars",
+      href: "/shop?category=RC%20Cars",
+      hasDropdown: true,
+      dropdownItems: [
+        { label: "All RC Cars", href: "/shop?category=RC%20Cars" },
+        { label: "Monster Trucks (8S & 4S)", href: "/shop?category=RC%20Cars&q=Monster", badge: "HOT" },
+        { label: "Rock Crawlers & Off-Road", href: "/shop?category=RC%20Crawlers" },
+        { label: "Drift & High-Speed Racers", href: "/shop?category=RC%20Drift" },
+        { label: "Mini RC Cars (1:28 / 1:64)", href: "/shop?category=Mini%20RC%20Cars" },
+      ],
+    },
+    {
+      id: "nav-rc-accessories",
+      label: "RC Accessories",
+      href: "/shop?category=RC%20Car%20Accessories",
+    },
+    {
+      id: "nav-hotwheels",
+      label: "Hotwheels",
+      href: "/shop?category=Hotwheels",
+    },
+    {
+      id: "nav-contact",
+      label: "Contact",
+      href: isHomePage ? "#contact" : "/#contact",
+    },
+  ];
 
   // Helper to format href correctly from any subpage
   const formatHref = (href: string) => {
@@ -30,72 +87,20 @@ export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
     return href;
   };
 
-  // Exact sequence: HOME -> SHOP -> OUR WORLD -> COMING SOON -> ABOUT -> EXPERIENCE -> CONTACT
-  const uniqueNavigation = useMemo(() => {
-    const seen = new Set<string>();
-    const filtered = (navigation || []).filter((item) => {
-      const cleanLabel = (item.label || "").trim().toLowerCase().replace(/[\s\-_]/g, "");
-      const cleanHref = (item.href || "").trim().toLowerCase();
-      // Hide "About Us" item and "Features"
-      if (cleanLabel === "aboutus") return false;
-      if (cleanLabel === "features" || cleanHref === "#features") return false;
-
-      const key = `${(item.label || "").trim().toUpperCase()}_${cleanHref}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-
-    const getOrderWeight = (item: NavigationItem) => {
-      const href = (item.href || "").toLowerCase();
-      const label = (item.label || "").toLowerCase();
-
-      if (href.includes("hero") || label === "home") return 1;
-      if (href === "/shop" || href.includes("shop") || label === "shop") return 2;
-      if (href.includes("world") || label.includes("world")) return 3;
-      if (href.includes("coming") || label.includes("coming")) return 4;
-      if (href.includes("about") || label === "about") return 5;
-      if (href.includes("experience") || label.includes("experience")) return 6;
-      if (href.includes("contact") || label.includes("contact")) return 7;
-      return item.sort_order ? item.sort_order + 10 : 99;
-    };
-
-    // Ensure Shop is in navigation if not already in DB
-    const hasShop = filtered.some(
-      (item) =>
-        (item.label || "").toLowerCase() === "shop" ||
-        (item.href || "").toLowerCase() === "/shop"
-    );
-
-    const result = [...filtered];
-    if (!hasShop) {
-      result.push({
-        id: "nav-shop",
-        label: "SHOP",
-        href: "/shop",
-        sort_order: 2,
-        is_visible: true,
-        created_at: "",
-        updated_at: "",
-      });
-    }
-
-    return result.sort((a, b) => getOrderWeight(a) - getOrderWeight(b));
-  }, [navigation]);
-
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
 
-      // Exact page order: hero → our-world → coming-soon → about → experience → contact
-      const sections = ["contact", "experience", "about", "coming-soon", "our-world", "hero"];
-      for (const sectionId of sections) {
-        const el = document.getElementById(sectionId);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= 120 && rect.bottom >= 120) {
-            setActiveHref(`#${sectionId}`);
-            return;
+      if (isHomePage) {
+        const sections = ["contact", "experience", "about", "coming-soon", "our-world", "hero"];
+        for (const sectionId of sections) {
+          const el = document.getElementById(sectionId);
+          if (el) {
+            const rect = el.getBoundingClientRect();
+            if (rect.top <= 120 && rect.bottom >= 120) {
+              setActiveHref(`#${sectionId}`);
+              return;
+            }
           }
         }
       }
@@ -103,7 +108,7 @@ export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isHomePage]);
 
   // Close mobile menu on resize to desktop
   useEffect(() => {
@@ -115,6 +120,40 @@ export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  const handleMouseEnterDropdown = (id: string) => {
+    if (dropdownTimeoutRef.current) clearTimeout(dropdownTimeoutRef.current);
+    setActiveDropdown(id);
+  };
+
+  const handleMouseLeaveDropdown = () => {
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setActiveDropdown(null);
+    }, 150);
+  };
+
+  // Determine active state cleanly
+  const isItemActive = (item: NavLinkItem) => {
+    if (pathname === "/shop") {
+      return item.id === "nav-shop";
+    }
+    if (pathname.startsWith("/shop?category=RC%20Cars")) {
+      return item.id === "nav-rc-cars";
+    }
+    if (pathname.startsWith("/shop?category=RC%20Car%20Accessories") || pathname.startsWith("/shop?category=RC%20Accessories")) {
+      return item.id === "nav-rc-accessories";
+    }
+    if (pathname.startsWith("/shop?category=Hotwheels")) {
+      return item.id === "nav-hotwheels";
+    }
+    if (pathname.startsWith("/products")) {
+      return item.id === "nav-shop";
+    }
+    if (isHomePage) {
+      if (item.href === "#contact" && activeHref === "#contact") return true;
+    }
+    return false;
+  };
 
   return (
     <header
@@ -130,7 +169,7 @@ export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
             onClick={() => setMobileMenuOpen(false)}
             className="flex items-center gap-2 group shrink-0"
           >
-            <div className="relative h-10 w-44 sm:h-11 sm:w-48 flex items-center transition-transform duration-300 group-hover:scale-105">
+            <div className="relative h-10 w-40 sm:h-11 sm:w-44 flex items-center transition-transform duration-300 group-hover:scale-105">
               <Image
                 src={settings.logo_url || "/logo/Screenshot 2026-08-18 121555.png"}
                 alt={settings.business_name || "RC Gadgets"}
@@ -142,40 +181,84 @@ export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
             </div>
           </Link>
 
-          {/* Center Navigation Links (Desktop) */}
+          {/* Center Navigation Links (Matching Exact Title-Case Reference Design) */}
           <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
-            {uniqueNavigation.map((item) => {
+            {navItems.map((item) => {
               const targetHref = formatHref(item.href);
-              const itemHref = (item.href || "").toLowerCase();
-              const itemLabel = (item.label || "").toLowerCase();
+              const isActive = isItemActive(item);
+              const isDropdownOpen = activeDropdown === item.id;
 
-              // Exact single-active determination
-              let isActive = false;
-              if (pathname === "/shop" || pathname.startsWith("/shop") || pathname.startsWith("/products")) {
-                isActive = itemHref === "/shop" || itemLabel === "shop";
-              } else if (isHomePage) {
-                if (itemHref === "/shop" || itemLabel === "shop") {
-                  isActive = false;
-                } else if (itemHref === "#hero" || itemHref === "/" || itemLabel === "home") {
-                  isActive = activeHref === "#hero" || activeHref === "" || activeHref === "/";
-                } else {
-                  isActive = activeHref === item.href;
-                }
+              if (item.hasDropdown && item.dropdownItems) {
+                return (
+                  <div
+                    key={item.id}
+                    className="relative py-3"
+                    onMouseEnter={() => handleMouseEnterDropdown(item.id)}
+                    onMouseLeave={handleMouseLeaveDropdown}
+                  >
+                    <Link
+                      href={targetHref}
+                      className={`text-[13px] font-medium transition-colors flex items-center gap-1 py-1 ${
+                        isActive
+                          ? "text-white font-semibold"
+                          : "text-zinc-300 hover:text-white"
+                      }`}
+                    >
+                      <span>{item.label}</span>
+                      <ChevronDown
+                        className={`w-3.5 h-3.5 opacity-70 transition-transform duration-200 ${
+                          isDropdownOpen ? "rotate-180 text-[#FF5A00]" : ""
+                        }`}
+                      />
+                    </Link>
+
+                    {isActive && (
+                      <span className="absolute bottom-1.5 left-0 right-0 h-[2px] bg-[#FF5A00] shadow-[0_0_8px_#FF5A00] rounded-full" />
+                    )}
+
+                    {/* Sleek Dark Dropdown Popup */}
+                    {isDropdownOpen && (
+                      <div className="absolute top-full -left-4 w-60 bg-[#0D0D10]/98 backdrop-blur-xl border border-zinc-800/90 rounded-2xl p-2 shadow-2xl shadow-black/80 space-y-1 animate-in fade-in slide-in-from-top-2 z-50">
+                        {item.dropdownItems.map((sub) => (
+                          <Link
+                            key={sub.href}
+                            href={sub.href}
+                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-zinc-300 hover:text-white hover:bg-zinc-800/80 transition-all group"
+                          >
+                            <span>{sub.label}</span>
+                            {sub.badge ? (
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-black uppercase tracking-wider bg-[#FF5A00] text-white">
+                                {sub.badge}
+                              </span>
+                            ) : (
+                              <ArrowRight className="w-3 h-3 text-zinc-600 opacity-0 group-hover:opacity-100 group-hover:text-[#FF5A00] transition-opacity" />
+                            )}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
               }
 
               return (
-                <Link
-                  key={item.id}
-                  href={targetHref}
-                  className={`relative py-1 text-[11px] font-bold uppercase tracking-wider transition-colors duration-200 ${
-                    isActive ? "text-white" : "text-[#A5A5A5] hover:text-white"
-                  }`}
-                >
-                  {item.label}
+                <div key={item.id} className="relative py-3">
+                  <Link
+                    href={targetHref}
+                    className={`text-[13px] font-medium transition-colors py-1 block ${
+                      isActive
+                        ? "text-white font-semibold"
+                        : "text-zinc-300 hover:text-white"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+
                   {isActive && (
-                    <span className="absolute -bottom-1.5 left-0 right-0 h-[2px] bg-[#FF5A00] shadow-[0_0_8px_#FF5A00] rounded-full" />
+                    <span className="absolute bottom-1.5 left-0 right-0 h-[2px] bg-[#FF5A00] shadow-[0_0_8px_#FF5A00] rounded-full" />
                   )}
-                </Link>
+                </div>
               );
             })}
           </nav>
@@ -202,7 +285,7 @@ export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
               aria-label="Shopping Cart"
             >
               <ShoppingBag className="w-4 h-4 text-[#FF5A00]" />
-              <span className="text-[11px] font-bold text-zinc-200">Cart</span>
+              <span className="text-[12px] font-medium text-zinc-200">Cart</span>
               {cartCount > 0 && (
                 <span className="w-4 h-4 rounded-full bg-[#FF5A00] text-white text-[9px] font-black flex items-center justify-center animate-in zoom-in">
                   {cartCount}
@@ -258,22 +341,57 @@ export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
       {mobileMenuOpen && (
         <div className="lg:hidden absolute top-full left-0 right-0 bg-black/98 backdrop-blur-xl border-b border-zinc-800 shadow-2xl shadow-black/80 px-5 py-5 transition-all duration-300 animate-in fade-in slide-in-from-top-2">
           <div className="flex flex-col space-y-1">
-            {uniqueNavigation.map((item) => {
+            {navItems.map((item) => {
               const targetHref = formatHref(item.href);
-              const itemHref = (item.href || "").toLowerCase();
-              const itemLabel = (item.label || "").toLowerCase();
+              const isActive = isItemActive(item);
+              const isSubOpen = openMobileDropdown === item.id;
 
-              let isActive = false;
-              if (pathname === "/shop" || pathname.startsWith("/shop") || pathname.startsWith("/products")) {
-                isActive = itemHref === "/shop" || itemLabel === "shop";
-              } else if (isHomePage) {
-                if (itemHref === "/shop" || itemLabel === "shop") {
-                  isActive = false;
-                } else if (itemHref === "#hero" || itemHref === "/" || itemLabel === "home") {
-                  isActive = activeHref === "#hero" || activeHref === "" || activeHref === "/";
-                } else {
-                  isActive = activeHref === item.href;
-                }
+              if (item.hasDropdown && item.dropdownItems) {
+                return (
+                  <div key={item.id} className="space-y-1">
+                    <div className="flex items-center justify-between py-2 px-3 rounded-lg text-xs font-semibold text-zinc-300 hover:text-white hover:bg-zinc-900/50">
+                      <Link
+                        href={targetHref}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={isActive ? "text-[#FF5A00] font-bold" : ""}
+                      >
+                        {item.label}
+                      </Link>
+                      <button
+                        onClick={() =>
+                          setOpenMobileDropdown(isSubOpen ? null : item.id)
+                        }
+                        className="p-1 text-zinc-400 hover:text-white"
+                      >
+                        <ChevronDown
+                          className={`w-4 h-4 transition-transform ${
+                            isSubOpen ? "rotate-180 text-[#FF5A00]" : ""
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {isSubOpen && (
+                      <div className="pl-4 space-y-1 border-l-2 border-zinc-800 ml-3">
+                        {item.dropdownItems.map((sub) => (
+                          <Link
+                            key={sub.href}
+                            href={sub.href}
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="py-2 px-3 rounded-lg text-xs font-medium text-zinc-400 hover:text-white hover:bg-zinc-900/40 flex items-center justify-between block"
+                          >
+                            <span>{sub.label}</span>
+                            {sub.badge && (
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-[#FF5A00] text-white">
+                                {sub.badge}
+                              </span>
+                            )}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
               }
 
               return (
@@ -281,16 +399,13 @@ export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
                   key={item.id}
                   href={targetHref}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`py-3 px-3 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center justify-between transition-colors ${
+                  className={`py-2.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-between transition-colors ${
                     isActive
-                      ? "text-[#FF5A00] bg-zinc-900/80 font-black"
+                      ? "text-[#FF5A00] bg-zinc-900/80 font-bold"
                       : "text-zinc-300 hover:text-white hover:bg-zinc-900/50"
                   }`}
                 >
-                  <span className="flex items-center gap-2">
-                    {isActive && <span className="w-1.5 h-1.5 rounded-full bg-[#FF5A00]" />}
-                    {item.label}
-                  </span>
+                  <span>{item.label}</span>
                   <ArrowRight
                     className={`w-3.5 h-3.5 ${isActive ? "text-[#FF5A00]" : "text-zinc-600"}`}
                   />
@@ -314,4 +429,3 @@ export const Header: React.FC<HeaderProps> = ({ settings, navigation }) => {
     </header>
   );
 };
-

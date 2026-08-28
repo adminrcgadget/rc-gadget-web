@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Montserrat, Orbitron } from "next/font/google";
 import { getSiteSettings } from "@/lib/queries/site";
+import { FloatingWhatsApp } from "@/components/public/FloatingWhatsApp";
 import "./globals.css";
 
 const inter = Inter({
@@ -48,11 +49,13 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const settings = await getSiteSettings();
+
   return (
     <html
       lang="en"
@@ -61,9 +64,10 @@ export default function RootLayout({
     >
       <body
         suppressHydrationWarning
-        className="min-h-screen bg-[#FAFAFA] text-[#111111] font-sans antialiased selection:bg-[#FF5A00] selection:text-white"
+        className="min-h-screen bg-white text-[#111111] font-sans antialiased selection:bg-[#FF5A00] selection:text-white"
       >
         {children}
+        <FloatingWhatsApp phone={settings?.whatsapp_number || settings?.phone} />
       </body>
     </html>
   );

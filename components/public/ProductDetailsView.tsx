@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Product, SiteSettings } from "@/types/database";
@@ -18,6 +18,11 @@ import {
   Truck,
   Wrench,
   Clock,
+  Play,
+  Maximize2,
+  X,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 
 interface ProductDetailsViewProps {
@@ -26,20 +31,96 @@ interface ProductDetailsViewProps {
   settings: SiteSettings;
 }
 
+type MediaItem =
+  | { type: "image"; url: string; id: string }
+  | { type: "video"; url: string; id: string; thumbnail?: string };
+
 export function ProductDetailsView({
   product,
   relatedProducts,
   settings,
 }: ProductDetailsViewProps) {
+  const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
   const [activeTab, setActiveTab] = useState<"specs" | "description" | "shipping">(
     "specs"
   );
   const [copiedLink, setCopiedLink] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isVideoMuted, setIsVideoMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const { addToCart, toggleWishlist, isInWishlist } = useStore();
   const isWish = isInWishlist(product.id);
+
+  // Consolidate all product media into a clean list
+  const mediaList: MediaItem[] = useMemo(() => {
+    const list: MediaItem[] = [];
+
+    // 1. Primary image
+    if (product.image_url && product.image_url.trim().length > 0) {
+      list.push({
+        type: "image",
+        url: product.image_url.trim(),
+        id: "main-image",
+      });
+    }
+
+    // 2. Additional gallery images
+    if (product.gallery_images && Array.isArray(product.gallery_images)) {
+      product.gallery_images.forEach((imgUrl, idx) => {
+        if (imgUrl && typeof imgUrl === "string" && imgUrl.trim().length > 0) {
+          // Avoid duplicate of primary image
+          if (imgUrl.trim() !== product.image_url?.trim()) {
+            list.push({
+              type: "image",
+              url: imgUrl.trim(),
+              id: `gallery-img-${idx}`,
+            });
+          }
+        }
+      });
+    }
+
+    // 3. Product Video
+    if (product.video_url && product.video_url.trim().length > 0) {
+      list.push({
+        type: "video",
+        url: product.video_url.trim(),
+        id: "product-video",
+        thumbnail: product.image_url || undefined,
+      });
+    }
+
+    // Fallback if no images at all
+    if (list.length === 0) {
+      list.push({
+        type: "image",
+        url: "",
+        id: "placeholder",
+      });
+    }
+
+    return list;
+  }, [product.image_url, product.gallery_images, product.video_url]);
+
+  const activeMedia = mediaList[selectedMediaIndex] || mediaList[0];
+
+  // Helper to detect if video is YouTube
+  const isYouTube =
+    activeMedia?.type === "video" &&
+    (activeMedia.url.includes("youtube.com") || activeMedia.url.includes("youtu.be"));
+
+  const getYouTubeEmbedUrl = (url: string) => {
+    if (url.includes("youtu.be/")) {
+      const id = url.split("youtu.be/")[1]?.split("?")[0];
+      return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}`;
+    }
+    const match = url.match(/[?&]v=([^&]+)/);
+    const id = match ? match[1] : "";
+    return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&mute=1&loop=1&playlist=${id}`;
+  };
 
   const discount =
     product.original_price && product.original_price > product.price
@@ -63,13 +144,44 @@ export function ProductDetailsView({
     window.open(url, "_blank");
   };
 
-  const handleShare = () => {
-    if (typeof window !== "undefined") {
-      navigator.clipboard?.writeText(window.location.href);
+  const handleShare = async () => {
+    if (typeof window === "undefined") return;
+    const shareData = {
+      title: `${product.title} | RC Gadgets`,
+      text: `Check out ${product.title} at RC Gadgets Kottakkal!`,
+      url: window.location.href,
+    };
+
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          console.error("Error sharing:", err);
+        }
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(window.location.href);
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 2500);
+    } catch (e) {
+      console.error("Clipboard failed", e);
     }
   };
+
+  // Close fullscreen lightbox on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsFullscreen(false);
+    };
+    if (isFullscreen) {
+      window.addEventListener("keydown", handleKeyDown);
+    }
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isFullscreen]);
 
   const specsList = [
     { label: "Category", value: product.category_name },
@@ -77,7 +189,7 @@ export function ProductDetailsView({
     { label: "Model ID", value: `RCG-${product.id.slice(0, 8).toUpperCase()}` },
     { label: "Rating", value: `${product.rating || 4.9} / 5.0 (${product.reviews_count || 48} reviews)` },
     { label: "Availability", value: (product.stock_quantity ?? 0) > 0 ? "In Stock — Kottakkal Store" : "Available to Order" },
-    { label: "Power System", value: "High-Discharge Electric Brushless / LiPo" },
+    { label: "Power System", value: "High-Discharge Electric Brushless / LiPo Compatible" },
     { label: "Radio Control", value: "2.4GHz Anti-Interference Pro-Grade Transmitter" },
     { label: "In the Box", value: "RTR Assembled Model, Transmitter, Accessories & Manual" },
   ];
@@ -116,68 +228,190 @@ export function ProductDetailsView({
         </Link>
       </div>
 
-      {/* 2. Product Detail Grid (Apple/Nike Standard) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
-        {/* Left Column: Minimal Photo Stage (7 cols) */}
-        <div className="lg:col-span-7 space-y-4">
-          <div className="relative w-full aspect-square rounded-3xl bg-[#F6F6F6] p-8 flex items-center justify-center overflow-hidden group">
-            {/* Top Minimal Badge */}
-            {product.badge && (
-              <span className="absolute top-5 left-5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-black text-white z-10">
-                {product.badge}
-              </span>
-            )}
-            {discount && (
-              <span className="absolute top-5 right-14 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-600 text-white z-10">
-                {discount}% OFF
-              </span>
-            )}
+      {/* 2. Product Detail Grid (Left Gallery Column + Right Buy Box) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        {/* Left Column: Multi-Thumbnail Strip + Main Stage (7 cols) */}
+        <div className="lg:col-span-7 flex flex-col-reverse lg:flex-row gap-4 sm:gap-5 items-start">
+          {/* Vertical Thumbnail Strip (Desktop) / Horizontal Row (Mobile) */}
+          {mediaList.length > 1 && (
+            <div className="flex lg:flex-col gap-2.5 sm:gap-3 overflow-x-auto lg:overflow-y-auto w-full lg:w-20 shrink-0 pb-2 lg:pb-0 scrollbar-none max-h-[500px]">
+              {mediaList.map((item, idx) => {
+                const isSelected = selectedMediaIndex === idx;
+                const isVideo = item.type === "video";
 
-            {/* Share & Wishlist buttons */}
-            <div className="absolute top-5 right-5 z-10 flex items-center gap-2">
-              <button
-                onClick={handleShare}
-                className="p-2 rounded-full bg-white/90 backdrop-blur-xs text-gray-600 hover:text-black transition-colors"
-                title="Share link"
-              >
-                <Share2 className="w-4 h-4" />
-              </button>
+                return (
+                  <button
+                    key={item.id || idx}
+                    onClick={() => setSelectedMediaIndex(idx)}
+                    onMouseEnter={() => setSelectedMediaIndex(idx)}
+                    className={`relative w-16 h-16 sm:w-18 sm:h-18 lg:w-20 lg:h-20 rounded-xl sm:rounded-2xl bg-white border transition-all flex items-center justify-center p-1.5 shrink-0 cursor-pointer overflow-visible ${
+                      isSelected
+                        ? "border-[#FF5A00] shadow-sm ring-2 ring-[#FF5A00]/20"
+                        : "border-gray-200 hover:border-gray-400"
+                    }`}
+                    title={isVideo ? "Watch Video Preview" : `View Photo ${idx + 1}`}
+                  >
+                    {/* Active Pip Arrow pointing right to main stage (matching reference screenshot) */}
+                    {isSelected && (
+                      <span className="hidden lg:block absolute -right-[6px] top-1/2 -translate-y-1/2 w-2 h-2 bg-[#FF5A00] rotate-45 z-20" />
+                    )}
+
+                    {isVideo ? (
+                      <div className="relative w-full h-full rounded-lg bg-gray-900 flex flex-col items-center justify-center overflow-hidden">
+                        {item.thumbnail ? (
+                          <Image
+                            src={item.thumbnail}
+                            alt="Video Thumbnail"
+                            fill
+                            sizes="80px"
+                            className="object-contain p-1 opacity-60"
+                          />
+                        ) : null}
+                        <div className="w-7 h-7 rounded-full bg-black/80 text-white flex items-center justify-center shadow-md z-10">
+                          <Play className="w-3.5 h-3.5 fill-white text-white ml-0.5" />
+                        </div>
+                      </div>
+                    ) : item.url ? (
+                      <div className="relative w-full h-full">
+                        <Image
+                          src={item.url}
+                          alt={`${product.title} - View ${idx + 1}`}
+                          fill
+                          sizes="80px"
+                          className="object-contain"
+                        />
+                      </div>
+                    ) : (
+                      <ShoppingBag className="w-5 h-5 text-gray-300" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Main Display Stage (Clean unified white background with single border - NO dual nested borders) */}
+          <div className="flex-1 w-full relative aspect-square sm:aspect-4/3 lg:aspect-square rounded-2xl sm:rounded-3xl bg-white border border-gray-200/90 p-6 sm:p-8 flex items-center justify-center overflow-hidden group shadow-xs">
+            {/* Top Badges */}
+            <div className="absolute top-4 left-4 z-20 flex flex-col gap-1.5 pointer-events-none">
+              {product.badge && (
+                <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-black text-white shadow-xs">
+                  {product.badge}
+                </span>
+              )}
+              {discount && (
+                <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-600 text-white shadow-xs">
+                  {discount}% OFF
+                </span>
+              )}
+            </div>
+
+            {/* Top Right Action Overlay (Share & Wishlist) */}
+            <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
+              <div className="relative">
+                <button
+                  onClick={handleShare}
+                  className="p-2.5 rounded-full bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 hover:text-black transition-all shadow-xs cursor-pointer active:scale-95"
+                  title="Share product link"
+                  aria-label="Share product"
+                >
+                  {copiedLink ? (
+                    <Check className="w-4 h-4 text-emerald-600 animate-in zoom-in" />
+                  ) : (
+                    <Share2 className="w-4 h-4" />
+                  )}
+                </button>
+
+                {/* Copied Feedback Tooltip */}
+                {copiedLink && (
+                  <span className="absolute right-0 top-full mt-1.5 px-2.5 py-1 rounded-lg bg-black text-white text-[10px] font-bold whitespace-nowrap shadow-lg animate-in fade-in slide-in-from-top-1 z-30">
+                    Link Copied!
+                  </span>
+                )}
+              </div>
 
               <button
                 onClick={() => toggleWishlist(product as any)}
-                className={`p-2 rounded-full bg-white/90 backdrop-blur-xs transition-colors cursor-pointer ${
-                  isWish ? "text-rose-500" : "text-gray-400 hover:text-black"
+                className={`p-2.5 rounded-full bg-gray-50 hover:bg-gray-100 border border-gray-200 transition-all shadow-xs cursor-pointer active:scale-95 ${
+                  isWish ? "text-rose-500 border-rose-200" : "text-gray-500 hover:text-black"
                 }`}
                 title={isWish ? "Remove from wishlist" : "Add to wishlist"}
+                aria-label="Wishlist"
               >
                 <Heart
-                  className={`w-4 h-4 ${isWish ? "fill-rose-500" : ""}`}
+                  className={`w-4 h-4 ${isWish ? "fill-rose-500 text-rose-500" : ""}`}
                 />
               </button>
             </div>
 
-            {/* Image */}
-            {product.image_url ? (
-              <Image
-                src={product.image_url}
-                alt={product.title}
-                fill
-                sizes="(max-width: 1024px) 100vw, 700px"
-                className="object-contain p-8 transition-transform duration-500 group-hover:scale-105"
-                priority
-              />
+            {/* Bottom Right Fullscreen Lightbox Button */}
+            {activeMedia?.type === "image" && activeMedia.url && (
+              <button
+                onClick={() => setIsFullscreen(true)}
+                className="absolute bottom-4 right-4 z-20 p-2.5 rounded-xl bg-gray-50/90 backdrop-blur-xs border border-gray-200 text-gray-700 hover:text-black hover:border-black transition-all shadow-xs group/btn cursor-pointer"
+                title="View Full Resolution"
+              >
+                <Maximize2 className="w-4 h-4 transition-transform group-hover/btn:scale-110" />
+              </button>
+            )}
+
+            {/* Main Stage Content: Video or High-Res Image */}
+            {activeMedia?.type === "video" ? (
+              <div className="relative w-full h-full rounded-2xl overflow-hidden bg-black flex items-center justify-center">
+                {isYouTube ? (
+                  <iframe
+                    src={getYouTubeEmbedUrl(activeMedia.url)}
+                    title={product.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full border-0"
+                  />
+                ) : (
+                  <div className="relative w-full h-full flex items-center justify-center">
+                    <video
+                      ref={videoRef}
+                      src={activeMedia.url}
+                      autoPlay
+                      loop
+                      muted={isVideoMuted}
+                      playsInline
+                      controls
+                      className="w-full h-full object-contain"
+                    />
+
+                    {/* Quick Mute/Unmute toggle */}
+                    <button
+                      type="button"
+                      onClick={() => setIsVideoMuted(!isVideoMuted)}
+                      className="absolute top-4 left-4 z-20 p-2 rounded-full bg-black/70 text-white hover:bg-black transition-colors"
+                      title={isVideoMuted ? "Unmute Video" : "Mute Video"}
+                    >
+                      {isVideoMuted ? (
+                        <VolumeX className="w-4 h-4" />
+                      ) : (
+                        <Volume2 className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : activeMedia?.url ? (
+              <div className="relative w-full h-full">
+                <Image
+                  src={activeMedia.url}
+                  alt={product.title}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 700px"
+                  className="object-contain p-4 sm:p-6 transition-transform duration-500 group-hover:scale-105"
+                  priority
+                />
+              </div>
             ) : (
               <div className="text-gray-300 text-sm font-medium">
                 RC Model Visual
               </div>
             )}
           </div>
-
-          {copiedLink && (
-            <div className="p-3 rounded-xl bg-gray-100 text-gray-900 text-xs font-semibold text-center animate-in fade-in">
-              Product link copied to clipboard
-            </div>
-          )}
         </div>
 
         {/* Right Column: Minimal Buy Box (5 cols) */}
@@ -230,7 +464,7 @@ export function ProductDetailsView({
               <div className="flex items-center border border-gray-300 rounded-full overflow-hidden">
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="px-3.5 py-1 text-gray-700 hover:bg-gray-100 font-medium"
+                  className="px-3.5 py-1 text-gray-700 hover:bg-gray-100 font-medium cursor-pointer"
                 >
                   -
                 </button>
@@ -239,7 +473,7 @@ export function ProductDetailsView({
                 </span>
                 <button
                   onClick={() => setQuantity((q) => q + 1)}
-                  className="px-3.5 py-1 text-gray-700 hover:bg-gray-100 font-medium"
+                  className="px-3.5 py-1 text-gray-700 hover:bg-gray-100 font-medium cursor-pointer"
                 >
                   +
                 </button>
@@ -365,7 +599,30 @@ export function ProductDetailsView({
         )}
       </div>
 
-      {/* 4. Related Products */}
+      {/* 4. Fullscreen Image Lightbox Modal */}
+      {isFullscreen && activeMedia?.type === "image" && activeMedia.url && (
+        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in">
+          <button
+            onClick={() => setIsFullscreen(false)}
+            className="absolute top-6 right-6 p-3 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors z-50 cursor-pointer"
+            title="Close (Esc)"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          <div className="relative w-full max-w-5xl h-[80vh] flex items-center justify-center p-4">
+            <Image
+              src={activeMedia.url}
+              alt={product.title}
+              fill
+              sizes="100vw"
+              className="object-contain"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* 5. Related Products */}
       {relatedProducts && relatedProducts.length > 0 && (
         <div className="border-t border-gray-200 pt-10 space-y-6">
           <div className="flex items-baseline justify-between">
@@ -387,7 +644,7 @@ export function ProductDetailsView({
                 href={`/products/${rel.id}`}
                 className="group flex flex-col justify-between"
               >
-                <div className="relative w-full aspect-square rounded-2xl bg-[#F6F6F6] flex items-center justify-center p-6 mb-3 overflow-hidden">
+                <div className="relative w-full aspect-square rounded-2xl bg-white border border-gray-200/80 flex items-center justify-center p-4 mb-3 overflow-hidden shadow-xs">
                   {rel.image_url ? (
                     <Image
                       src={rel.image_url}

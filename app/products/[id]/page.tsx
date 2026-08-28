@@ -100,7 +100,7 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
   return (
     <StoreProvider>
-      <main className="min-h-screen bg-[#F8F9FB] text-[#111111] selection:bg-[#FF5A00] selection:text-white relative pt-16 sm:pt-20">
+      <main className="min-h-screen bg-white text-[#111111] selection:bg-[#FF5A00] selection:text-white relative pt-16 sm:pt-20">
         {/* Header */}
         <Header settings={settings} navigation={navigation} />
 
